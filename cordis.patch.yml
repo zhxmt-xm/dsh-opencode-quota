@@ -1,0 +1,5 @@
+# 本 bundle 的 patch：把插件作为一条 Host 行插入 profile 根部。
+# 行 id `opencode-quota` 同时是设置项与插件管理里的标识。
+- insert:
+    - id: opencode-quota
+      name: '@local/dsh-opencode-quota'

@@ -1,0 +1,824 @@
+<!doctype html><html lang="zh"><head><meta charset="utf-8">
+<style>.theme{
+  --dsw-alias-bg-layer-1:#ffffff;
+  --dsw-alias-bg-layer-2:#faf9f7;
+  --dsw-alias-bg-layer-3:#f1f0ed;
+  --dsw-alias-bg-layer-4:#e8e7e3;
+  --dsw-alias-label-primary:#1b1b1e;
+  --dsw-alias-label-secondary:#55534e;
+  --dsw-alias-label-tertiary:#8b8882;
+  --dsw-alias-label-error:#c83a2f;
+  --dsw-alias-border-l1:rgba(0,0,0,.04);
+  --dsw-alias-border-l2:rgba(0,0,0,.08);
+  --dsw-alias-border-l3:rgba(0,0,0,.12);
+  --dsw-alias-border-l4:rgba(0,0,0,.16);
+  --dsw-alias-brand-primary:#2f6fed;
+}</style>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:#eceae6;-webkit-font-smoothing:antialiased}
+body{font-family:"Segoe UI","Microsoft YaHei UI","Microsoft YaHei",system-ui,sans-serif}
+.head{padding:20px 20px 2px}
+.h1{font-weight:600;font-size:17px;line-height:1.35;color:#1b1b1e;letter-spacing:.01em}
+.h2{margin-top:5px;font-weight:400;font-size:11.5px;line-height:1.45;color:#7c7a76}
+.sec{padding:16px 20px 2px}
+.secTitle{display:flex;align-items:baseline;gap:8px;margin:0 0 10px;font-weight:600;font-size:12.5px;line-height:1.3;color:#2a2926;letter-spacing:.02em}
+.secTitle span{font-weight:400;font-size:11.5px;color:#8b8882}
+.row{display:flex;gap:16px;align-items:flex-start}
+.col{display:flex;flex-direction:column;gap:7px}
+.cap{font-weight:600;font-size:12.5px;line-height:1.3;color:#2a2926;letter-spacing:.02em}
+.cap span{font-weight:400;color:#7c7a76;margin-left:6px}
+.pane{width:288px;padding:10px;border-radius:12px;background:#fbfaf9;display:flex;flex-direction:column;justify-content:flex-start}
+.stateRow{padding:11px 0 13px;border-top:1px solid rgba(0,0,0,.07)}
+.stateRow:first-child{border-top:0;padding-top:2px}
+.stateHead{display:flex;align-items:baseline;gap:8px;margin:0 0 9px;font-weight:600;font-size:12px;line-height:1.3;color:#1b1b1e}
+.stateHead span{font-weight:400;font-size:11px;color:#8b8882}
+.cells{display:grid;grid-template-columns:repeat(3,288px);gap:16px;align-items:start}
+.cell{margin:0;padding:0 10px;display:flex;flex-direction:column;gap:7px;min-width:0}
+.cell figcaption{font-weight:400;font-size:11px;line-height:1.45;color:#55534e;padding-left:2px}
+.cell figcaption b{font-weight:600;color:#1b1b1e;margin-right:3px}
+.oqc-slot[data-disabled=true] .oqc-block{border-style:dashed}
+.oqc-slot[data-disabled=true] .oqc-block[data-off=true]{opacity:.62}
+</style>
+<style>
+
+.oqc-root{display:flex;flex-direction:column;width:100%;min-width:0;align-self:stretch;flex:1 1 auto}
+.oqc-card{--oqc-font:"Microsoft YaHei UI","Microsoft YaHei","PingFang SC","Hiragino Sans GB","Segoe UI",system-ui,sans-serif;font-family:var(--oqc-font);box-sizing:border-box;width:100%;display:flex;flex-direction:column;gap:9px;padding:11px 11px 9px;margin:2px 0 6px;border:.5px solid var(--dsw-alias-border-l2);border-radius:11px;background:color-mix(in srgb,var(--dsw-alias-bg-layer-3) 11%,transparent);padding-left:10px;padding-right:10px}
+.oqc-card[data-variant=full]{gap:12px;padding:18px 20px 16px;margin:0;border-radius:13px}
+/* 分块：标题（左侧色标 + 字距标题 + 渐隐分隔线 + 右侧数值）把内容切成独立章节。 */
+.oqc-block{--oqc-block-bg:color-mix(in srgb,var(--dsw-alias-bg-layer-3) 78%,transparent);--oqc-block-bg-hover:color-mix(in srgb,var(--dsw-alias-bg-layer-3) 96%,transparent);--oqc-block-border:color-mix(in srgb,var(--dsw-alias-label-primary) 22%,transparent);--oqc-block-border-hover:color-mix(in srgb,var(--dsw-alias-label-primary) 42%,transparent);display:flex;flex-direction:column;gap:7px;min-width:0;padding:9px;border-radius:9px;border:1px solid var(--oqc-block-border);background:var(--oqc-block-bg);box-shadow:0 1px 2px color-mix(in srgb,var(--dsw-alias-label-primary) 7%,transparent);transition:background-color 140ms ease,border-color 140ms ease}
+.oqc-block:hover{--oqc-block-bg:var(--oqc-block-bg-hover);--oqc-block-border:var(--oqc-block-border-hover)}
+.oqc-block:hover .oqc-blockTick{background:color-mix(in srgb,var(--dsw-alias-label-primary) 62%,transparent)}
+.oqc-block:hover .oqc-blockTitle{color:var(--dsw-alias-label-primary)}
+.oqc-slot{position:relative;display:flex;flex-direction:column;min-width:0}
+.oqc-slot:empty{display:none}
+.oqc-slot[data-dragging=true]{opacity:.4}
+.oqc-slot::before{content:'';position:absolute;left:2px;right:2px;height:2px;border-radius:2px;background:#3b82f6;opacity:0;pointer-events:none;transition:opacity 120ms ease;z-index:3}
+.oqc-slot[data-over=before]::before{top:-5px;opacity:1}
+.oqc-slot[data-over=after]::before{bottom:-5px;opacity:1}
+.oqc-blockHead[data-grip=true]{cursor:grab}
+.oqc-blockHead[data-grip=true]:active{cursor:grabbing}
+.oqc-card[data-style=rail] .oqc-block{--oqc-rail:#3b82f6;border-left:2px solid var(--oqc-rail);border-radius:8px}
+.oqc-card[data-style=rail] .oqc-block:hover{--oqc-rail:#60a5fa}
+.oqc-card[data-variant=full] .oqc-block{gap:10px;padding:12px 14px 14px;border-radius:11px}
+.oqc-blockHead{display:flex;align-items:center;gap:7px;min-width:0;min-height:12px}
+.oqc-card[data-variant=full] .oqc-blockHead{min-height:14px;gap:9px}
+.oqc-blockTick{flex:none;width:2px;height:9px;border-radius:1px;background:color-mix(in srgb,var(--dsw-alias-label-primary) 45%,transparent)}
+.oqc-card[data-variant=full] .oqc-blockTick{width:3px;height:11px}
+.oqc-blockTitle{flex:none;font-size:9.5px;font-weight:600;line-height:1;letter-spacing:.14em;text-transform:uppercase;color:var(--dsw-alias-label-secondary)}
+.oqc-card[data-variant=full] .oqc-blockTitle{font-size:11px;letter-spacing:.16em}
+.oqc-blockRule{flex:1;min-width:12px;height:1px;background:linear-gradient(90deg,var(--dsw-alias-border-l4),color-mix(in srgb,var(--dsw-alias-border-l2) 55%,transparent))}
+.oqc-blockMeta{flex:none;display:inline-flex;align-items:center;gap:5px;font-size:10px;line-height:1;font-variant-numeric:tabular-nums;color:var(--dsw-alias-label-tertiary);white-space:nowrap}
+.oqc-card[data-variant=full] .oqc-blockMeta{font-size:11px}
+.oqc-blockTag{font-weight:500;letter-spacing:.02em}
+.oqc-head{position:relative;display:flex;flex-direction:column;gap:3px;min-width:0}
+.oqc-title{display:flex;align-items:center;gap:8px;min-width:0}
+.oqc-titleGroup{display:inline-flex;align-items:center;gap:3px;flex:1;min-width:0}
+.oqc-titleText{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px;font-weight:500;line-height:1.23;letter-spacing:.005em;color:var(--dsw-alias-label-primary)}
+.oqc-card[data-variant=full] .oqc-titleText{font-size:16px}
+.oqc-sub{font-size:10px;font-weight:500;line-height:1.4;letter-spacing:.07em;text-transform:uppercase;color:var(--dsw-alias-label-tertiary)}
+.oqc-sub[data-account=true]{text-transform:none;letter-spacing:.01em;opacity:.85}
+.oqc-card[data-variant=full] .oqc-sub{font-size:10.5px}
+.oqc-headActions{display:flex;align-items:center;gap:2px;flex:none}
+.oqc-refresh{width:18px;height:18px;flex:none;display:grid;place-items:center;border:0;border-radius:6px;background:transparent;color:var(--dsw-alias-label-tertiary);cursor:pointer;padding:0;transition:background 140ms ease,color 140ms ease}
+.oqc-refresh:hover{background:color-mix(in srgb,var(--dsw-alias-label-primary) 6%,transparent);color:var(--dsw-alias-label-primary)}
+.oqc-refresh:focus-visible{outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--dsw-alias-brand-primary) 26%,transparent)}
+.oqc-refresh svg{width:13px;height:13px;stroke-width:1.7}
+.oqc-refresh[data-busy=true] svg{animation:oqc-spin .9s linear infinite}
+@keyframes oqc-spin{to{transform:rotate(360deg)}}
+.oqc-quota{display:flex;flex-direction:column;gap:9px}
+.oqc-rows{display:flex;flex-direction:column;gap:10px}
+.oqc-card[data-variant=full] .oqc-rows{gap:16px}
+.oqc-row{display:flex;flex-direction:column;gap:5px}
+.oqc-card[data-variant=full] .oqc-row{gap:8px}
+.oqc-top{display:flex;align-items:center;gap:6px;min-width:0;height:17px;line-height:17px;font-size:11px}
+.oqc-card[data-variant=full] .oqc-top{gap:8px;height:22px;line-height:22px;font-size:13px}
+.oqc-name{flex:none;font-weight:400;letter-spacing:.01em;color:var(--dsw-alias-label-secondary)}
+.oqc-reset{flex:1;display:flex;align-items:center;gap:4px;min-width:0;overflow:hidden;white-space:nowrap;font-weight:400;color:var(--dsw-alias-label-tertiary)}
+.oqc-resetWord{flex:none}
+.oqc-dur{font-family:inherit;font-weight:400;font-variant-numeric:tabular-nums;letter-spacing:-.01em;color:var(--dsw-alias-label-secondary);text-overflow:ellipsis;overflow:hidden}
+.oqc-pct{flex:none;display:flex;align-items:center;gap:3px;white-space:nowrap}
+.oqc-pctNum{font-family:inherit;font-weight:400;font-variant-numeric:tabular-nums;letter-spacing:-.02em;color:var(--dsw-alias-label-primary)}
+.oqc-pctSign{margin-left:1px}
+.oqc-pctUnit{font-weight:400;letter-spacing:.02em;color:var(--dsw-alias-label-tertiary)}
+.oqc-tierTag{flex:none;font-family:inherit;max-width:96px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500;letter-spacing:.02em}
+.oqc-bar{height:5px;border-radius:999px;background:color-mix(in srgb,var(--dsw-alias-label-primary) 10%,transparent);overflow:hidden}
+.oqc-card[data-variant=full] .oqc-bar{height:7px}
+.oqc-fill{height:100%;border-radius:999px;background:var(--dsw-alias-brand-primary)}
+.oqc-body{display:flex;flex-direction:column;gap:8px}
+.oqc-empty{margin:0;font-size:11px;font-weight:400;line-height:1.45;color:var(--dsw-alias-label-tertiary)}
+.oqc-card[data-variant=full] .oqc-empty{font-size:12.5px}
+.oqc-spend{display:flex;flex-direction:column;gap:9px}
+.oqc-stats{display:flex;gap:12px}
+.oqc-card[data-variant=full] .oqc-stats{gap:18px}
+.oqc-stat{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:3px}
+.oqc-statLabel{font-size:9.5px;font-weight:500;line-height:1.2;letter-spacing:.06em;color:var(--dsw-alias-label-tertiary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.oqc-card[data-variant=full] .oqc-statLabel{font-size:10.5px}
+.oqc-statValue{display:flex;align-items:baseline;gap:0;font-family:inherit;font-size:11px;font-weight:500;line-height:1.3;letter-spacing:-.01em;font-variant-numeric:tabular-nums;color:var(--dsw-alias-label-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.oqc-card[data-variant=full] .oqc-statValue{font-size:12px}
+.oqc-cur{margin-right:1px;font-weight:400;color:var(--dsw-alias-label-secondary)}
+.oqc-unit{margin-left:1px;font-weight:400;color:var(--dsw-alias-label-secondary)}
+.oqc-spendTop{display:flex;align-items:baseline;gap:8px;min-width:0}
+.oqc-spendValue{font-family:inherit;font-size:15px;font-weight:500;line-height:1.1;letter-spacing:-.02em;color:var(--dsw-alias-label-primary)}
+.oqc-card[data-variant=full] .oqc-spendValue{font-size:20px}
+.oqc-spendMeta{display:flex;align-items:center;gap:10px;font-size:10px;line-height:1.4;color:var(--dsw-alias-label-tertiary)}
+.oqc-card[data-variant=full] .oqc-spendMeta{font-size:12px;gap:14px}
+.oqc-chart{display:flex;flex-direction:column;gap:5px}
+.oqc-chartBody{display:flex;gap:7px;min-width:0}
+.oqc-yAxis{position:relative;flex:none;width:30px;height:52px;font-size:9px;line-height:1;font-variant-numeric:tabular-nums;color:var(--dsw-alias-label-tertiary)}
+.oqc-yAxis>span{position:absolute;right:0;line-height:1}
+.oqc-yAxis>span.oqc-yTop{top:0}
+.oqc-yAxis>span.oqc-yMid{top:50%;transform:translateY(-50%)}
+.oqc-yAxis>span.oqc-yBottom{bottom:0}
+.oqc-chart[data-size=full] .oqc-yAxis{height:84px;font-size:10px;width:38px}
+.oqc-forecast .oqc-yAxis{height:64px}
+.oqc-chart[data-size=full].oqc-forecast .oqc-yAxis{height:112px}
+.oqc-plot{position:relative;flex:1;min-width:0;height:52px;overflow:visible}
+.oqc-chart[data-size=full] .oqc-plot{height:84px}
+.oqc-forecast .oqc-plot{height:64px}
+.oqc-chart[data-size=full].oqc-forecast .oqc-plot{height:112px}
+.oqc-limitLine{position:absolute;left:0;right:0;height:0;border-top:1px dashed color-mix(in srgb,var(--dsw-alias-label-primary) 45%,transparent)}
+.oqc-hitDot{position:absolute;width:6px;height:6px;border-radius:50%;background:#d9822b;transform:translate(-50%,-50%);box-shadow:0 0 0 2px color-mix(in srgb,#d9822b 25%,transparent)}
+.oqc-mark{position:absolute;transform:translate(-50%,-150%);padding:1px 4px;border-radius:4px;background:var(--dsw-alias-bg-layer-1,#fff);border:.5px solid var(--dsw-alias-border-l2);font-size:9px;line-height:1.3;white-space:nowrap;color:var(--dsw-alias-label-secondary);pointer-events:none}
+.oqc-markEnd{transform:translate(-100%,-150%)}
+.oqc-markSide{transform:translate(-118%,-50%)}
+.oqc-tip.oqc-tip-start{transform:translate(0,-140%)}
+.oqc-tip.oqc-tip-center{transform:translate(-50%,-140%)}
+.oqc-tip.oqc-tip-end{transform:translate(-100%,-140%)}
+.oqc-vline{position:absolute;top:0;bottom:0;width:0;border-left:1px dashed color-mix(in srgb,#d9822b 60%,transparent)}
+.oqc-crosshair{position:absolute;top:0;bottom:0;width:0;border-left:1px dashed color-mix(in srgb,var(--dsw-alias-label-primary) 30%,transparent);pointer-events:none}
+.oqc-tip{position:absolute;z-index:3;max-width:150px;transform:translate(-50%,-140%);padding:2px 6px;border-radius:5px;background:var(--dsw-alias-bg-layer-1,#fff);border:.5px solid var(--dsw-alias-border-l2);font-size:10px;line-height:1.4;white-space:nowrap;color:var(--dsw-alias-label-primary);box-shadow:0 4px 12px -4px rgba(0,0,0,.25);pointer-events:none}
+.oqc-legend{display:flex;align-items:center;gap:12px;font-size:9.5px;line-height:1.4;color:var(--dsw-alias-label-tertiary);flex-wrap:wrap}
+.oqc-legendItem{display:inline-flex;align-items:center;gap:4px}
+.oqc-legendMark{display:inline-block;width:7px;height:7px;border-radius:2px}
+.oqc-forecastHint{margin-top:-2px}
+.oqc-gridline{position:absolute;left:0;right:0;height:0;border-top:.5px dashed color-mix(in srgb,var(--dsw-alias-label-primary) 14%,transparent)}
+.oqc-spark{position:absolute;inset:0;display:block;width:100%;height:100%;overflow:visible}
+.oqc-dot{position:absolute;border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 0 1.5px var(--dsw-alias-bg-layer-1,#fff);pointer-events:none}
+.oqc-bars{position:absolute;inset:0;display:flex;align-items:flex-end;gap:2px}
+.oqc-barCol{flex:1 1 0;min-width:0;height:100%;display:flex;align-items:flex-end;justify-content:center;opacity:.82;transition:opacity 120ms ease}
+.oqc-barCol[data-on=true]{opacity:1}
+.oqc-barFill{display:block;width:100%;max-width:18px;border-radius:2px 2px 1px 1px}
+.oqc-xTick{white-space:nowrap}
+.oqc-xAxis[data-dense=day]{font-size:8px}
+.oqc-xAxis[data-dense=hour]{font-size:7.5px;letter-spacing:-.02em}
+.oqc-xAxis{position:relative;display:flex;gap:2px;height:12px;margin-left:37px;font-size:9px;line-height:1;font-variant-numeric:tabular-nums;color:var(--dsw-alias-label-tertiary)}
+.oqc-xAxis .oqc-xTick{position:static;top:auto;transform:none;flex:1 1 0;min-width:0;text-align:center}
+.oqc-chart[data-size=full] .oqc-xAxis{margin-left:45px;font-size:10px;height:13px}
+.oqc-xAxis>span{position:absolute;top:0;white-space:nowrap}
+.oqc-xStart{left:0}
+.oqc-xMid{left:50%;transform:translateX(-50%)}
+.oqc-xEnd{right:0}
+.oqc-xMark{transform:translateX(-50%);color:#d9822b}
+.oqc-models{display:flex;flex-direction:column;gap:6px}
+.oqc-modelRow{display:flex;align-items:center;gap:8px;font-size:11px;line-height:1.3}
+.oqc-card[data-variant=full] .oqc-modelRow{font-size:12.5px;gap:10px}
+.oqc-modelName{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--dsw-alias-label-secondary)}
+.oqc-modelBar{flex:none;width:56px;height:6px;border-radius:999px;background:color-mix(in srgb,var(--dsw-alias-label-primary) 10%,transparent);overflow:hidden}
+.oqc-card[data-variant=full] .oqc-modelBar{width:96px;height:7px}
+.oqc-modelFill{display:block;height:100%;border-radius:999px}
+.oqc-modelCost{flex:none;font-family:inherit;font-variant-numeric:tabular-nums;color:var(--dsw-alias-label-primary)}
+.oqc-controls{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.oqc-check{flex:none;width:12px;height:12px;margin:0 2px 0 0;padding:0;accent-color:var(--dsw-alias-brand-primary);cursor:pointer}
+.oqc-block[data-off=true]{opacity:.45}
+.oqc-block[data-off=true]:hover{opacity:.7}
+.oqc-gauge{display:block;width:150px;height:84px;margin:0 auto 10px;align-self:center;font-family:inherit;color:var(--dsw-alias-label-primary)}
+.oqc-gaugeArc{display:block;width:150px;height:84px;overflow:visible}
+.oqc-gauge text{font-family:inherit;font-variant-numeric:tabular-nums}
+.oqc-table{display:flex;flex-direction:column;gap:8px}
+.oqc-card[data-variant=full] .oqc-table{gap:10px}
+.oqc-tr{display:flex;align-items:baseline;gap:8px;min-width:0}
+.oqc-trHead{font-size:9px;letter-spacing:.04em;color:var(--dsw-alias-label-tertiary)}
+.oqc-tlabel{flex:none;width:26px;font-size:10px;line-height:1.4;color:var(--dsw-alias-label-secondary)}
+.oqc-trHead .oqc-tlabel{width:26px}
+.oqc-td{flex:1 1 0;min-width:0;font-size:11px;line-height:1.35;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--dsw-alias-label-primary)}
+.oqc-trHead .oqc-td{font-size:9px;font-weight:400;color:var(--dsw-alias-label-tertiary)}
+.oqc-card[data-variant=full] .oqc-td{font-size:12px}
+.oqc-compare{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:10px;line-height:1.4;color:var(--dsw-alias-label-tertiary)}
+.oqc-card[data-variant=full] .oqc-compare{font-size:11px}
+.oqc-compareDelta{font-variant-numeric:tabular-nums;color:var(--dsw-alias-label-secondary)}
+.oqc-meta{display:inline-flex;align-items:center;gap:3px;flex:none;white-space:nowrap}
+.oqc-metaText{position:relative;top:-1px;display:inline-flex;align-items:center;gap:3px;flex:none;white-space:nowrap;font-size:10px;line-height:1;color:var(--dsw-alias-label-tertiary)}
+.oqc-card[data-variant=full] .oqc-metaText{font-size:11px;gap:4px}
+.oqc-metaLabel,.oqc-metaTime{flex:none;font-weight:400;font-variant-numeric:tabular-nums;letter-spacing:0;color:var(--dsw-alias-label-secondary)}
+.oqc-title{align-items:center;gap:4px}
+.oqc-pop{padding:4px 8px;border-radius:6px;background:var(--dsw-alias-bg-layer-1,#fff);border:.5px solid var(--dsw-alias-border-l2);box-shadow:0 6px 16px -6px rgba(0,0,0,.4);font-size:10.5px;line-height:1.4;white-space:nowrap;color:var(--dsw-alias-label-secondary);pointer-events:none}
+.oqc-metaTip{position:absolute;left:auto;right:-4px;top:calc(100% + 6px);z-index:6;display:none}
+.oqc-metaText:hover .oqc-metaTip{display:block}
+.oqc-barTip{position:absolute;top:0;transform:translate(-50%,0);z-index:5;display:flex;flex-direction:column;align-items:flex-start;gap:1px}
+.oqc-barTipTime{font-size:10px;line-height:1.35;color:var(--dsw-alias-label-tertiary);font-variant-numeric:tabular-nums}
+.oqc-barTipValue{font-size:11px;line-height:1.35;font-weight:500;color:var(--dsw-alias-label-primary);font-variant-numeric:tabular-nums}
+.oqc-barTip.oqc-barTipStart{transform:translate(0,0)}
+.oqc-barTip.oqc-barTipEnd{transform:translate(-100%,0)}
+.oqc-rail{display:grid;place-items:center;width:34px;height:34px;margin:0 auto 4px;border:.5px solid var(--dsw-alias-border-l2);border-radius:8px;background:color-mix(in srgb,var(--dsw-alias-bg-layer-3) 42%,transparent);color:var(--dsw-alias-label-secondary);font-family:inherit;font-size:10px;font-weight:500;font-variant-numeric:tabular-nums;cursor:pointer;transition:color 140ms ease,background 140ms ease}
+.oqc-rail:hover{color:var(--dsw-alias-label-primary);background:color-mix(in srgb,var(--dsw-alias-label-primary) 6%,transparent)}
+.oqc-rail:focus-visible{outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--dsw-alias-brand-primary) 26%,transparent)}
+.oqc-page{--oqc-font:"Microsoft YaHei UI","Microsoft YaHei","PingFang SC","Hiragino Sans GB","Segoe UI",system-ui,sans-serif;font-family:var(--oqc-font);display:flex;flex-direction:column;gap:18px;padding:4px 2px 28px;max-width:640px}
+.oqc-pageTitle{margin:0;font-size:15px;font-weight:500;line-height:1.23;color:var(--dsw-alias-label-primary)}
+.oqc-desc{margin:0;font-size:12.5px;font-weight:400;line-height:1.6;color:var(--dsw-alias-label-secondary)}
+.oqc-panel{display:flex;flex-direction:column;gap:10px;padding:14px 16px;border:.5px solid var(--dsw-alias-border-l2);border-radius:10px;background:color-mix(in srgb,var(--dsw-alias-bg-layer-3) 40%,transparent)}
+.oqc-panelHead{display:flex;align-items:center;gap:8px}
+.oqc-panelTitle{flex:1;min-width:0;font-size:12.5px;font-weight:500;color:var(--dsw-alias-label-primary)}
+.oqc-chip{flex:none;font-size:10px;font-weight:500;line-height:1.6;letter-spacing:.04em;padding:0 7px;border-radius:999px;background:color-mix(in srgb,var(--dsw-alias-brand-primary) 12%,transparent);color:var(--dsw-alias-brand-primary)}
+.oqc-chip[data-off=true]{background:color-mix(in srgb,var(--dsw-alias-label-primary) 8%,transparent);color:var(--dsw-alias-label-tertiary)}
+.oqc-input{box-sizing:border-box;width:100%;height:34px;padding:0 12px;border:.5px solid var(--dsw-alias-border-l4);border-radius:8px;background:var(--dsw-alias-bg-layer-3);color:var(--dsw-alias-label-primary);font:inherit;font-size:12.5px}
+.oqc-input:focus-visible{outline:none;border-color:var(--dsw-alias-brand-primary);box-shadow:0 0 0 3px color-mix(in srgb,var(--dsw-alias-brand-primary) 26%,transparent)}
+.oqc-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.oqc-btn{display:inline-flex;align-items:center;height:30px;padding:0 12px;border:.5px solid var(--dsw-alias-border-l4);border-radius:8px;background:transparent;color:var(--dsw-alias-label-primary);font:inherit;font-size:12px;font-weight:500;cursor:pointer;transition:background 140ms ease}
+.oqc-btn:hover:not(:disabled){background:color-mix(in srgb,var(--dsw-alias-label-primary) 6%,transparent)}
+.oqc-btn:disabled{opacity:.5;cursor:default}
+.oqc-btn:focus-visible{outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--dsw-alias-brand-primary) 26%,transparent)}
+.oqc-btnPrimary{background:var(--dsw-alias-brand-primary);border-color:transparent;color:#fff;font-weight:500}
+.oqc-btnPrimary:hover:not(:disabled){background:var(--dsw-alias-brand-primary);filter:brightness(1.06)}
+.oqc-seg{display:inline-flex;align-items:center;gap:2px;padding:2px;border:.5px solid var(--dsw-alias-border-l2);border-radius:8px;background:color-mix(in srgb,var(--dsw-alias-bg-layer-3) 55%,transparent)}
+.oqc-segBtn{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 9px;border:0;border-radius:6px;background:transparent;color:var(--dsw-alias-label-secondary);font:inherit;font-size:11.5px;font-weight:500;cursor:pointer;transition:background 140ms ease,color 140ms ease}
+.oqc-segBtn:hover{color:var(--dsw-alias-label-primary)}
+.oqc-segBtn[aria-pressed=true]{background:color-mix(in srgb,var(--dsw-alias-label-primary) 10%,transparent);color:var(--dsw-alias-label-primary)}
+.oqc-segBtn:focus-visible{outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--dsw-alias-brand-primary) 26%,transparent)}
+.oqc-card .oqc-seg{border:0;background:transparent;padding:0;gap:1px}
+.oqc-card .oqc-segBtn{height:20px;padding:0 7px;font-size:10.5px;border-radius:5px;gap:5px;color:var(--dsw-alias-label-tertiary)}
+.oqc-card .oqc-segBtn:hover{color:var(--dsw-alias-label-primary);background:color-mix(in srgb,var(--dsw-alias-label-primary) 6%,transparent)}
+.oqc-card .oqc-segBtn[aria-pressed=true]{background:color-mix(in srgb,var(--dsw-alias-label-primary) 10%,transparent);color:var(--dsw-alias-label-primary)}
+.oqc-card[data-variant=full] .oqc-segBtn{height:26px;padding:0 10px;font-size:12px}
+.oqc-swatch{width:10px;height:10px;border-radius:3px;flex:none;border:.5px solid color-mix(in srgb,var(--dsw-alias-label-primary) 20%,transparent)}
+.oqc-levelHead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.oqc-ghostBtn{display:inline-flex;align-items:center;gap:5px;height:24px;padding:0 9px;border:.5px solid var(--dsw-alias-border-l2);border-radius:7px;background:transparent;color:var(--dsw-alias-label-secondary);font:inherit;font-size:11px;font-weight:500;cursor:pointer;transition:background 140ms ease,border-color 140ms ease,color 140ms ease}
+.oqc-ghostBtn svg{width:12px;height:12px;flex:none}
+.oqc-ghostBtn:hover:not(:disabled){border-color:var(--dsw-alias-border-l4);background:color-mix(in srgb,var(--dsw-alias-label-primary) 5%,transparent);color:var(--dsw-alias-label-primary)}
+.oqc-ghostBtn:disabled{opacity:.45;cursor:default}
+.oqc-ghostBtn:focus-visible{outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--dsw-alias-brand-primary) 26%,transparent)}
+.oqc-rowDel{flex:none;display:flex;align-items:center;justify-content:center;width:20px;height:20px;padding:0;border:0;border-radius:5px;background:transparent;color:var(--dsw-alias-label-tertiary);cursor:pointer;opacity:0;transition:opacity 120ms ease,background 120ms ease,color 120ms ease}
+.oqc-rowDel svg{width:12px;height:12px}
+.oqc-tier:hover .oqc-rowDel,.oqc-rowDel:focus-visible{opacity:1}
+.oqc-rowDel:hover:not(:disabled){background:color-mix(in srgb,var(--dsw-alias-label-error,#e0483a) 12%,transparent);color:var(--dsw-alias-label-error,#e0483a)}
+.oqc-rowDel:disabled{display:none}
+.oqc-form{display:flex;flex-direction:column;gap:6px}
+.oqc-formHead{display:flex;align-items:center;gap:8px;padding:0 2px;font-size:10px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--dsw-alias-label-tertiary)}
+.oqc-colChip{flex:none;width:24px}
+.oqc-colName{flex:1;min-width:0}
+.oqc-colRange{flex:none;width:150px}
+.oqc-colFollow{flex:none;width:96px}
+.oqc-colDel{flex:none;width:20px}
+.oqc-tier{display:flex;align-items:center;gap:8px;min-width:0}
+.oqc-chipWrap{position:relative;display:block;flex:none;width:24px;height:24px;border-radius:7px;cursor:pointer}
+.oqc-chipFill{position:absolute;inset:0;border-radius:7px;border:.5px solid var(--dsw-alias-border-l4);box-shadow:inset 0 0 0 1px rgba(0,0,0,.05)}
+.oqc-chipInput{position:absolute;inset:0;width:100%;height:100%;padding:0;border:0;opacity:0;cursor:pointer}
+.oqc-chipWrap:hover .oqc-chipFill{box-shadow:0 0 0 3px color-mix(in srgb,var(--dsw-alias-brand-primary) 20%,transparent)}
+.oqc-chipWrap:focus-within .oqc-chipFill{box-shadow:0 0 0 3px color-mix(in srgb,var(--dsw-alias-brand-primary) 26%,transparent)}
+.oqc-field{box-sizing:border-box;min-width:0;flex:1;height:28px;padding:0 8px;border:.5px solid var(--dsw-alias-border-l4);border-radius:7px;background:var(--dsw-alias-bg-layer-3);color:var(--dsw-alias-label-primary);font:inherit;font-size:12px}
+.oqc-field::placeholder{color:var(--dsw-alias-label-tertiary)}
+.oqc-field:focus-visible{outline:none;border-color:var(--dsw-alias-brand-primary);box-shadow:0 0 0 3px color-mix(in srgb,var(--dsw-alias-brand-primary) 26%,transparent)}
+.oqc-field:disabled{opacity:.55;cursor:default}
+.oqc-fieldNum{flex:none;width:56px;padding:0 6px;font-family:inherit;font-size:11.5px;text-align:right}
+.oqc-range{flex:none;display:flex;align-items:center;gap:4px;width:150px;min-width:0}
+.oqc-rangeDash{flex:none;font-size:11px;color:var(--dsw-alias-label-tertiary)}
+.oqc-rangePct{flex:none;font-size:10.5px;color:var(--dsw-alias-label-tertiary)}
+.oqc-follow{flex:none;display:flex;align-items:center;gap:6px;width:96px;font-size:11px;color:var(--dsw-alias-label-secondary);white-space:nowrap;cursor:pointer}
+.oqc-hint{margin:0;font-size:10.5px;font-weight:400;line-height:1.5;color:var(--dsw-alias-label-tertiary)}
+.oqc-keyList{display:flex;flex-direction:column;gap:6px}
+.oqc-keyRow{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;border:.5px solid var(--dsw-alias-border-l2);background:color-mix(in srgb,var(--dsw-alias-bg-layer-1) 52%,transparent)}
+.oqc-keyName{flex:none;min-width:88px;font-size:12px;font-weight:500;color:var(--dsw-alias-label-primary)}
+.oqc-keyRef{flex:none;font-family:ui-monospace,"SF Mono",Consolas,monospace;font-size:11px;letter-spacing:.01em;color:var(--dsw-alias-label-secondary)}
+.oqc-keyRow .oqc-chip{margin-left:auto}
+.oqc-keyEdit{display:flex;flex-direction:column;gap:8px}
+.oqc-acctList{display:flex;flex-direction:column;gap:10px}
+.oqc-acct{display:flex;flex-direction:column;gap:6px;padding:9px 10px;border-radius:9px;border:.5px solid var(--dsw-alias-border-l2);background:color-mix(in srgb,var(--dsw-alias-bg-layer-1) 45%,transparent)}
+.oqc-acct[data-current=true]{border-color:color-mix(in srgb,var(--dsw-alias-brand-primary) 34%,transparent);background:color-mix(in srgb,var(--dsw-alias-brand-primary) 4%,transparent)}
+.oqc-acctHead{display:flex;align-items:center;gap:8px}
+.oqc-acctName{flex:1;min-width:0;font-size:12px;font-weight:500;color:var(--dsw-alias-label-primary)}
+.oqc-acct .oqc-keyRow{border:0;background:transparent;padding:2px 0}
+.oqc-tipBtn{flex:none;display:grid;place-items:center;width:13px;height:13px;padding:0;border:.5px solid var(--dsw-alias-border-l4);border-radius:50%;background:transparent;color:var(--dsw-alias-label-tertiary);font:inherit;font-size:9px;line-height:1;cursor:pointer}
+.oqc-tipBtn:hover{color:var(--dsw-alias-label-primary);border-color:var(--dsw-alias-label-tertiary)}
+.oqc-tipPop{position:absolute;z-index:9;top:20px;right:0;max-width:250px;padding:8px 10px;border:1px solid var(--dsw-alias-border-l2);border-radius:8px;background:var(--dsw-alias-bg-layer-1);box-shadow:0 8px 22px rgba(0,0,0,.14);font-size:11px;font-weight:400;line-height:1.55;color:var(--dsw-alias-label-secondary);white-space:normal}
+.oqc-keyRow[data-editing=true]{border-color:color-mix(in srgb,var(--dsw-alias-brand-primary) 40%,transparent);background:color-mix(in srgb,var(--dsw-alias-brand-primary) 6%,transparent)}
+.oqc-keyBtn{flex:none;height:22px;padding:0 8px;border:.5px solid var(--dsw-alias-border-l4);border-radius:6px;background:transparent;color:var(--dsw-alias-label-secondary);font:inherit;font-size:11px;cursor:pointer;transition:background 140ms ease,color 140ms ease}
+.oqc-keyBtn:hover{background:color-mix(in srgb,var(--dsw-alias-label-primary) 6%,transparent);color:var(--dsw-alias-label-primary)}
+.oqc-panelHead .oqc-btn{height:24px;padding:0 9px;font-size:11px}
+.oqc-block[data-skeleton=true]{pointer-events:none}
+.oqc-sk{display:flex;flex-direction:column;gap:8px;padding:3px 0 1px}
+.oqc-sk span{display:block;height:9px;border-radius:5px;background:linear-gradient(90deg,color-mix(in srgb,var(--dsw-alias-label-primary) 7%,transparent) 0%,color-mix(in srgb,var(--dsw-alias-label-primary) 15%,transparent) 45%,color-mix(in srgb,var(--dsw-alias-label-primary) 7%,transparent) 100%);background-size:220% 100%;animation:oqc-sk 1.5s ease-in-out infinite}
+.oqc-sk span:nth-child(2){width:78%}
+.oqc-sk span:nth-child(3){width:56%}
+.oqc-slot[data-id=today] .oqc-sk span:nth-child(1){height:46px;border-radius:9px}
+.oqc-slot[data-id=trend] .oqc-sk span:nth-child(1){height:52px;border-radius:8px;width:100%}
+.oqc-slot[data-id=models] .oqc-sk span:nth-child(1){width:100%}
+@keyframes oqc-sk{0%{background-position:130% 0}100%{background-position:-30% 0}}
+@media (prefers-reduced-motion:reduce){.oqc-sk span{animation:none}}
+.oqc-error{margin:0;font-size:11.5px;font-weight:400;line-height:1.5;color:var(--dsw-alias-label-error,#e0483a)}
+.oqc-note{margin:0;font-size:11.5px;font-weight:400;line-height:1.5;color:var(--dsw-alias-label-secondary)}
+@media (prefers-reduced-motion:reduce){.oqc-fill,.oqc-btn,.oqc-refresh,.oqc-rail,.oqc-segBtn,.oqc-block{transition:none}.oqc-refresh[data-busy=true] svg{animation:none}}</style>
+<style>
+.oqc-card.oqc-shim{padding:0;border:0;border-radius:0;background:none;box-shadow:none;margin:0;gap:0}
+</style>
+</head><body class="theme">
+<div class="head">
+  <div class="h1">OpenCode 配额卡 · 账户形态 × 分块状态</div>
+  <div class="h2">浅色主题 · 侧栏宽度 268px · 直接渲染 client.js；虚线块 = 产品里会整块隐藏的分块，位置保留</div>
+</div>
+<div class="sec">
+  <div class="secTitle">A · 三种账户形态，每种都保留全部五块<span>不适用的块留在原位，画成禁用态</span></div>
+  <div class="row"><div class="col">
+    <div class="cap">只有 Go 订阅<span>五块全亮</span></div>
+    <div class="pane"><div class="oqc-card" data-variant="sidebar" data-style="panel" on-drag-over="(event) =&gt; {
+        if (!dragging) return
+        event.preventDefault()
+        try {
+          event.dataTransfer.dropEffect = 'move'
+        } catch {
+          /* 忽略：只影响光标样式 */
+        }
+        const slot = slotAt(event)
+        if (!slot || slot.id === dragging || !sections[slot.id]) {
+          if (dropAt) setDropAt(null)
+          return
+        }
+        if (!dropAt || dropAt.id !== slot.id || dropAt.after !== slot.after) setDropAt(slot)
+      }" on-drop="(event) =&gt; {
+        if (!dragging) return
+        event.preventDefault()
+        const slot = slotAt(event)
+        if (slot &amp;&amp; slot.id !== dragging &amp;&amp; sections[slot.id]) moveTo(dragging, slot.id, slot.after)
+        setDragging(null)
+        setDropAt(null)
+      }"><div class="oqc-head"><div class="oqc-title"><span class="oqc-titleGroup"><span class="oqc-titleText">OpenCode Go</span><span class="oqc-metaText"><span class="oqc-metaLabel">更新于</span><span class="oqc-metaTime">2分钟前</span><span class="oqc-pop oqc-metaTip">每 1 分钟自动刷新</span></span></span><span class="oqc-headActions"><button type="button" class="oqc-refresh" data-busy="false" title="立即刷新" aria-label="立即刷新" on-click="() =&gt; api.refresh({ fresh: true })"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13 8a5 5 0 1 1-1.6-3.7M13 3v3h-3" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="oqc-refresh" title="打开设置" aria-label="打开设置" on-click="() =&gt; {}"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 5h7M12.5 5H14M2 11h2.5M8 11h6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><circle cx="10.5" cy="5" r="1.7" fill="none" stroke="currentColor" stroke-width="1.9"/><circle cx="5" cy="11" r="1.7" fill="none" stroke="currentColor" stroke-width="1.9"/></svg></button></span></div></div><div class="oqc-slot" data-id="today" data-dragging="false" data-over="false"><div class="oqc-block" data-off="false"><div draggable data-grip="true" title="拖拽标题调整顺序" on-drag-start="(event) =&gt; {
+          const target = event.target
+          if (target &amp;&amp; target.closest &amp;&amp; target.closest('button,input,a')) {
+            event.preventDefault()
+            return
+          }
+          setDragging(id)
+          try {
+            event.dataTransfer.effectAllowed = 'move'
+            event.dataTransfer.setData('text/plain', id)
+          } catch {
+            /* 忽略：某些环境不给 dataTransfer */
+          }
+        }" on-drag-end="() =&gt; {
+          setDragging(null)
+          setDropAt(null)
+        }" class="oqc-blockHead"><span class="oqc-blockTick"></span><span class="oqc-blockTitle">用量</span><span class="oqc-blockRule"></span></div><div class="oqc-gauge"><svg class="oqc-gaugeArc" viewBox="0 0 100 56" aria-hidden="true"><path d="M8 52A42 42 0 0 1 92 52" path-length="100" fill="none" stroke="currentColor" stroke-opacity="0.15" stroke-width="7" stroke-linecap="round"/><path d="M8 52A42 42 0 0 1 92 52" path-length="100" fill="none" stroke="var(--dsw-alias-brand-primary)" stroke-width="7" stroke-linecap="round" stroke-dasharray="92 100"/><text x="50" y="46" text-anchor="middle" font-size="11.5" font-weight="500" letter-spacing="-0.2" fill="currentColor">92%</text><text x="50" y="55" text-anchor="middle" font-size="6.5" fill="currentColor" fill-opacity="0.6">本月剩余</text></svg></div><div class="oqc-table"><div class="oqc-tr oqc-trHead"><span class="oqc-tlabel"></span><span class="oqc-td">花费</span><span class="oqc-td">请求数</span><span class="oqc-td">Tokens</span></div><div class="oqc-tr"><span class="oqc-tlabel">今日</span><span class="oqc-td"><span class="oqc-cur">$</span><span >3.90</span></span><span class="oqc-td"><span >483</span></span><span class="oqc-td"><span >12.2</span><span class="oqc-unit">M</span></span></div><div class="oqc-tr"><span class="oqc-tlabel">本周</span><span class="oqc-td"><span class="oqc-cur">$</span><span >3.90</span></span><span class="oqc-td"><span >640</span></span><span class="oqc-td"><span >6.8</span><span class="oqc-unit">M</span></span></div><div class="oqc-tr"><span class="oqc-tlabel">本月</span><span class="oqc-td"><span class="oqc-cur">$</span><span >3.90</span></span><span class="oqc-td"><span >483</span></span><span class="oqc-td"><span >12.2</span><span class="oqc-unit">M</span></span></div></div></div></div><div class="oqc-slot" data-id="quota" data-dragging="false" data-over="false"><div class="oqc-block" data-off="false"><div draggable data-grip="true" title="拖拽标题调整顺序" on-drag-start="(event) =&gt; {
+          const target = event.target
+          if (target &amp;&amp; target.closest &amp;&amp; target.closest('button,input,a')) {
+            event.preventDefault()
+            return
+          }
+          setDragging(id)
+          try {
+            event.dataTransfer.effectAllowed = 'move'
+            event.dataTransfer.setData('text/plain', id)
+          } catch {
+            /* 忽略：某些环境不给 dataTransfer */
+          }
+        }" on-drag-end="() =&gt; {
+          setDragging(null)
+          setDropAt(null)
+        }" class="oqc-blockHead"><span class="oqc-blockTick"></span><span class="oqc-blockTitle">额度重置时间</span><span class="oqc-blockRule"></span><span class="oqc-blockMeta"><span class="oqc-blockTag" style="color:var(--dsw-alias-brand-primary)">正常</span></span></div><div class="oqc-rows"><div class="oqc-row" title="正常"><div class="oqc-top"><span class="oqc-name">滚动</span><span class="oqc-reset"><span class="oqc-dur">1小时21分</span><span class="oqc-resetWord">后重置</span></span><span class="oqc-pct"><span class="oqc-pctNum">34<span class="oqc-pctSign">%</span></span><span class="oqc-pctUnit">已用</span></span></div><div class="oqc-bar"><div class="oqc-fill" style="width:34%;background:var(--dsw-alias-brand-primary)"></div></div></div><div class="oqc-row" title="正常"><div class="oqc-top"><span class="oqc-name">本周</span><span class="oqc-reset"><span class="oqc-dur">4天3小时</span><span class="oqc-resetWord">后重置</span></span><span class="oqc-pct"><span class="oqc-pctNum">21<span class="oqc-pctSign">%</span></span><span class="oqc-pctUnit">已用</span></span></div><div class="oqc-bar"><div class="oqc-fill" style="width:21%;background:var(--dsw-alias-brand-primary)"></div></div></div><div class="oqc-row" title="正常"><div class="oqc-top"><span class="oqc-name">本月</span><span class="oqc-reset"><span class="oqc-dur">28天23小时</span><span class="oqc-resetWord">后重置</span></span><span class="oqc-pct"><span class="oqc-pctNum">8<span class="oqc-pctSign">%</span></span><span class="oqc-pctUnit">已用</span></span></div><div class="oqc-bar"><div class="oqc-fill" style="width:8%;background:var(--dsw-alias-brand-primary)"></div></div></div></div></div></div><div class="oqc-slot" data-id="forecast" data-dragging="false" data-over="false"><div class="oqc-block" data-off="false"><div draggable data-grip="true" title="拖拽标题调整顺序" on-drag-start="(event) =&gt; {
+          const target = event.target
+          if (target &amp;&amp; target.closest &amp;&amp; target.closest('button,input,a')) {
+            event.preventDefault()
+            return
+          }
+          setDragging(id)
+          try {
+            event.dataTransfer.effectAllowed = 'move'
+            event.dataTransfer.setData('text/plain', id)
+          } catch {
+            /* 忽略：某些环境不给 dataTransfer */
+          }
+        }" on-drag-end="() =&gt; {
+          setDragging(null)
+          setDropAt(null)
+        }" class="oqc-blockHead"><span class="oqc-blockTick"></span><span class="oqc-blockTitle">月度预测</span><span class="oqc-blockRule"></span><span class="oqc-blockMeta">日均 4.0%</span></div><div class="oqc-chart oqc-forecast" data-size="compact"><div class="oqc-chartBody"><div class="oqc-yAxis"><span class="oqc-yBottom">0%</span><span class="oqc-yMid" style="top:33.33333333333334%">100%</span><span class="oqc-yTop">150%</span></div><div class="oqc-plot" on-mouse-move="(event) =&gt; {
+                const rect = event.currentTarget.getBoundingClientRect()
+                if (!rect.width) return
+                const ratio = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width))
+                const target = periodStart + ratio * (resetAt - periodStart)
+                let best = hoverPoints[0]
+                for (const point of hoverPoints) {
+                  if (Math.abs(point.at - target) &lt; Math.abs(best.at - target)) best = point
+                }
+                setTip(tipFor(best))
+              }" on-mouse-leave="() =&gt; setTip(null)"><span class="oqc-gridline" style="top:0%"></span><span class="oqc-gridline" style="top:100%"></span><span class="oqc-vline" style="left:40.7156588354988%"></span><span class="oqc-vline" style="left:81.4313176709976%"></span><span class="oqc-limitLine" style="top:66.66666666666667%"></span><span class="oqc-limitLine" style="top:33.33333333333334%"></span><svg class="oqc-spark" viewBox="0 0 100 100" preserve-aspect-ratio="none" role="img"><path d="M0.00,100.00 L0.00,99.43 L0.00,98.59 L0.00,98.21 L0.00,96.94 L2.09,96.18 L5.32,95.13 L6.51,94.67 L6.51,100 L0.00,100 Z" fill="#2ea043" opacity="0.12"/><path d="M0.00,100.00 L0.00,99.43 L0.00,98.59 L0.00,98.21 L0.00,96.94 L2.09,96.18 L5.32,95.13 L6.51,94.67" fill="none" stroke="#2ea043" stroke-width="1.6" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"/><path d="M6.51,94.67 L100,18.13" fill="none" stroke="#d9822b" stroke-width="1.4" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"/></svg><span class="oqc-dot" style="left:0%;top:100%;background:#2ea043;width:3.5px;height:3.5px"></span><span class="oqc-dot" style="left:0%;top:99.42564102564103%;background:#2ea043;width:3.5px;height:3.5px"></span><span class="oqc-dot" style="left:0%;top:98.591452991453%;background:#2ea043;width:3.5px;height:3.5px"></span><span class="oqc-dot" style="left:0%;top:98.20854700854701%;background:#2ea043;width:3.5px;height:3.5px"></span><span class="oqc-dot" style="left:0%;top:96.93675213675213%;background:#2ea043;width:3.5px;height:3.5px"></span><span class="oqc-dot" style="left:2.0904644563918757%;top:96.18461538461538%;background:#2ea043;width:3.5px;height:3.5px"></span><span class="oqc-dot" style="left:5.316270908004779%;top:95.13162393162393%;background:#2ea043;width:3.5px;height:3.5px"></span><span class="oqc-dot" style="left:6.514505413679809%;top:94.66666666666667%;background:#2ea043;width:6px;height:6px"></span><span class="oqc-dot" style="left:100%;top:18.131416052953654%;background:#d9822b;width:6px;height:6px"></span><span class="oqc-hitDot" style="left:40.7156588354988%;top:66.66666666666667%"></span><span class="oqc-hitDot" style="left:81.4313176709976%;top:33.33333333333334%"></span><span class="oqc-mark oqc-markSide" style="left:100%;top:18.131416052953654%">123%</span></div></div><div class="oqc-xAxis"><span class="oqc-xStart">10/27</span><span class="oqc-xMark" style="left:40.7156588354988%">11/9</span><span class="oqc-xMark" style="left:81.4313176709976%">11/21</span><span class="oqc-xEnd">11/27</span></div><div class="oqc-legend"><span class="oqc-legendItem"><i class="oqc-legendMark" style="background:#2ea043"></i>实测</span><span class="oqc-legendItem"><i class="oqc-legendMark" style="background:#d9822b"></i>预测</span></div></div></div></div><div class="oqc-slot" data-id="trend" data-dragging="false" data-over="false"><div class="oqc-block" data-off="false"><div draggable data-grip="true" title="拖拽标题调整顺序" on-drag-start="(event) =&gt; {
+          const target = event.target
+          if (target &amp;&amp; target.closest &amp;&amp; target.closest('button,input,a')) {
+            event.preventDefault()
+            return
+          }
+          setDragging(id)
+          try {
+            event.dataTransfer.effectAllowed = 'move'
+            event.dataTransfer.setData('text/plain', id)
+          } catch {
+            /* 忽略：某些环境不给 dataTransfer */
+          }
+        }" on-drag-end="() =&gt; {
+          setDragging(null)
+          setDropAt(null)
+        }" class="oqc-blockHead"><span class="oqc-blockTick"></span><span class="oqc-blockTitle">趋势</span><span class="oqc-blockRule"></span><span class="oqc-blockMeta"><div class="oqc-seg"><button type="button" class="oqc-segBtn" aria-pressed="true" on-click="() =&gt; setRange(key)">7 天</button><button type="button" class="oqc-segBtn" on-click="() =&gt; setRange(key)">24 小时</button></div></span></div><div class="oqc-controls"><div class="oqc-seg"><button type="button" class="oqc-segBtn" aria-pressed="true" on-click="() =&gt; setMetric(key)">花费</button><button type="button" class="oqc-segBtn" on-click="() =&gt; setMetric(key)">Tokens</button><button type="button" class="oqc-segBtn" on-click="() =&gt; setMetric(key)">请求数</button></div></div><div class="oqc-chart" data-size="compact"><div class="oqc-chartBody"><div class="oqc-yAxis"><span class="oqc-yTop">$1.00</span><span class="oqc-yMid">$0.50</span><span class="oqc-yBottom">$0</span></div><div class="oqc-plot"><span class="oqc-gridline" style="top:0"></span><span class="oqc-gridline" style="top:50%"></span><span class="oqc-gridline" style="top:100%"></span><div class="oqc-bars" role="img" aria-label="10-23 $0.42   10-24 $0.61   10-25 $0.28   10-26 $0.93   10-27 $0.55   10-28 $0.77   10-29 $0.34" on-mouse-move="(event) =&gt; {
+                  const rect = event.currentTarget.getBoundingClientRect()
+                  if (!rect.width) return
+                  const ratio = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width))
+                  const index = Math.min(rows.length - 1, Math.floor(ratio * rows.length))
+                  if (tip !== index) setTip(index)
+                }" on-mouse-leave="() =&gt; setTip(null)"><span class="oqc-barCol" data-on="false"><span class="oqc-barFill" style="height:42%;background:#2ea043"></span></span><span class="oqc-barCol" data-on="false"><span class="oqc-barFill" style="height:61%;background:#2ea043"></span></span><span class="oqc-barCol" data-on="false"><span class="oqc-barFill" style="height:28.000000000000004%;background:#2ea043"></span></span><span class="oqc-barCol" data-on="false"><span class="oqc-barFill" style="height:93%;background:#2ea043"></span></span><span class="oqc-barCol" data-on="false"><span class="oqc-barFill" style="height:55.00000000000001%;background:#2ea043"></span></span><span class="oqc-barCol" data-on="false"><span class="oqc-barFill" style="height:77%;background:#2ea043"></span></span><span class="oqc-barCol" data-on="false"><span class="oqc-barFill" style="height:34%;background:#2ea043"></span></span></div></div></div><div class="oqc-xAxis" data-dense="day"><span class="oqc-xTick">10/23</span><span class="oqc-xTick">10/24</span><span class="oqc-xTick">10/25</span><span class="oqc-xTick">10/26</span><span class="oqc-xTick">10/27</span><span class="oqc-xTick">10/28</span><span class="oqc-xTick">10/29</span></div></div></div></div><div class="oqc-slot" data-id="models" data-dragging="false" data-over="false"><div class="oqc-block" data-off="false"><div draggable data-grip="true" title="拖拽标题调整顺序" on-drag-start="(event) =&gt; {
+          const target = event.target
+          if (target &amp;&amp; target.closest &amp;&amp; target.closest('button,input,a')) {
+            event.preventDefault()
+            return
+          }
+          setDragging(id)
+          try {
+            event.dataTransfer.effectAllowed = 'move'
+            event.dataTransfer.setData('text/plain', id)
+          } catch {
+            /* 忽略：某些环境不给 dataTransfer */
+          }
+        }" on-drag-end="() =&gt; {
+          setDragging(null)
+          setDropAt(null)
+        }" class="oqc-blockHead"><span class="oqc-blockTick"></span><span class="oqc-blockTitle">模型</span><span class="oqc-blockRule"></span></div><div class="oqc-models"><div class="oqc-modelRow"><span class="oqc-modelName" title="claude-sonnet-4-5">claude-sonnet-4-5</span><span class="oqc-modelBar"><span class="oqc-modelFill" style="width:100%;background:#2ea043"></span></span><span class="oqc-modelCost"><span class="oqc-cur">$</span><span >1.86</span></span></div><div class="oqc-modelRow"><span class="oqc-modelName" title="gpt-5.1-codex">gpt-5.1-codex</span><span class="oqc-modelBar"><span class="oqc-modelFill" style="width:49%;background:#2ea043"></span></span><span class="oqc-modelCost"><span class="oqc-cur">$</span><span >0.92</span></span></div><div class="oqc-modelRow"><span class="oqc-modelName" title="deepseek-v4.1-flash">deepseek-v4.1-flash</span><span class="oqc-modelBar"><span class="oqc-modelFill" style="width:22%;background:#2ea043"></span></span><span class="oqc-modelCost"><span class="oqc-cur">$</span><span >0.41</span></span></div></div></div></div></div></div>
+  </div><div class="col">
+    <div class="cap">只有按量计费<span>没有额度窗口</span></div>
+    <div class="pane"><div class="oqc-card" data-variant="sidebar" data-style="panel" on-drag-over="(event) =&gt; {
+        if (!dragging) return
+        event.preventDefault()
+        try {
+          event.dataTransfer.dropEffect = 'move'
+        } catch {
+          /* 忽略：只影响光标样式 */
+        }
+        const slot = slotAt(event)
+        if (!slot || slot.id === dragging || !sections[slot.id]) {
+          if (dropAt) setDropAt(null)
+          return
+        }
+        if (!dropAt || dropAt.id !== slot.id || dropAt.after !== slot.after) setDropAt(slot)
+      }" on-drop="(event) =&gt; {
+        if (!dragging) return
+        event.preventDefault()
+        const slot = slotAt(event)
+        if (slot &amp;&amp; slot.id !== dragging &amp;&amp; sections[slot.id]) moveTo(dragging, slot.id, slot.after)
+        setDragging(null)
+        setDropAt(null)
+      }"><div class="oqc-head"><div class="oqc-title"><span class="oqc-titleGroup"><span class="oqc-titleText">OpenCode Go</span><span class="oqc-metaText"><span class="oqc-metaLabel">更新于</span><span class="oqc-metaTime">2分钟前</span><span class="oqc-pop oqc-metaTip">每 1 分钟自动刷新</span></span></span><span class="oqc-headActions"><button type="button" class="oqc-refresh" data-busy="false" title="立即刷新" aria-label="立即刷新" on-click="() =&gt; api.refresh({ fresh: true })"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13 8a5 5 0 1 1-1.6-3.7M13 3v3h-3" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="oqc-refresh" title="打开设置" aria-label="打开设置" on-click="() =&gt; {}"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 5h7M12.5 5H14M2 11h2.5M8 11h6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><circle cx="10.5" cy="5" r="1.7" fill="none" stroke="currentColor" stroke-width="1.9"/><circle cx="5" cy="11" r="1.7" fill="none" stroke="currentColor" stroke-width="1.9"/></svg></button></span></div></div><div class="oqc-slot" data-id="today" data-dragging="false" data-over="false"><div class="oqc-block" data-off="false"><div draggable data-grip="true" title="拖拽标题调整顺序" on-drag-start="(event) =&gt; {
+          const target = event.target
+          if (target &amp;&amp; target.closest &amp;&amp; target.closest('button,input,a')) {
+            event.preventDefault()
+            return
+          }
+          setDragging(id)
+          try {
+            event.dataTransfer.effectAllowed = 'move'
+            event.dataTransfer.setData('text/plain', id)
+          } catch {
+            /* 忽略：某些环境不给 dataTransfer */
+          }
+        }" on-drag-end="() =&gt; {
+          setDragging(null)
+          setDropAt(null)
+        }" class="oqc-blockHead"><span class="oqc-blockTick"></span><span class="oqc-blockTitle">用量</span><span class="oqc-blockRule"></span></div><div class="oqc-table"><div class="oqc-tr oqc-trHead"><span class="oqc-tlabel"></span><span class="oqc-td">花费</span><span class="oqc-td">请求数</span><span class="oqc-td">Tokens</span></div><div class="oqc-tr"><span class="oqc-tlabel">今日</span><span class="oqc-td"><span class="oqc-cur">$</span><span >3.90</span></span><span class="oqc-td"><span >483</span></span><span class="oqc-td"><span >12.2</span><span class="oqc-unit">M</span></span></div><div class="oqc-tr"><span class="oqc-tlabel">本周</span><span class="oqc-td"><span class="oqc-cur">$</span><span >3.90</span></span><span class="oqc-td"><span >640</span></span><span class="oqc-td"><span >6.8</span><span class="oqc-unit">M</span></span></div></div></div></div><div class="oqc-slot" data-id="quota" data-disabled="true"><div class="oqc-block" data-off="true">
+  <div class="oqc-blockHead"><span class="oqc-blockTick"></span><span class="oqc-blockTitle">额度重置时间</span><span class="oqc-blockRule"></span><span class="oqc-blockMeta">不适用</span></div>
+  <p class="oqc-empty">没有 Go 订阅，没有额度窗口</p>
+</div></div><div class="oqc-slot" data-id="forecast" data-disabled="true"><div class="oqc-block" data-off="true">
+  <div class="oqc-blockHead"><span class="oqc-blockTick"></span><span class="oqc-blockTitle">月度预测</span><span class="oqc-blockRule"></span><span class="oqc-blockMeta">不适用</span></div>
+  <p class="oqc-empty">没有月度额度，无法预测</p>
+</div></div><div class="oqc-slot" data-id="trend" data-dragging="false" data-over="false"><div class="oqc-block" data-off="false"><div draggable data-grip="true" title="拖拽标题调整顺序" on-drag-start="(event) =&gt; {
+          const target = event.target
+          if (target &amp;&amp; target.closest &amp;&amp; target.closest('button,input,a')) {
+            event.preventDefault()
+            return
+          }
+          setDragging(id)
+          try {
+            event.dataTransfer.effectAllowed = 'move'
+            event.dataTransfer.setData('text/plain', id)
+          } catch {
+            /* 忽略：某些环境不给 dataTransfer */
+          }
+        }" on-drag-end="() =&gt; {
+          setDragging(null)
+          setDropAt(null)
+        }" class="oqc-blockHead"><span class="oqc-blockTick"></span><span class="oqc-blockTitle">趋势</span><span class="oqc-blockRule"></span><span class="oqc-blockMeta"><div class="oqc-seg"><button type="button" class="oqc-segBtn" aria-pressed="true" on-click="() =&gt; setRange(key)">7 天</button><button type="button" class="oqc-segBtn" on-click="() =&gt; setRange(key)">24 小时</button></div></span></div><div class="oqc-controls"><div class="oqc-seg"><button type="button" class="oqc-segBtn" aria-pressed="true" on-click="() =&gt; setMetric(key)">花费</button><button type="button" class="oqc-segBtn" on-click="() =&gt; setMetric(key)">Tokens</button><button type="button" class="oqc-segBtn" on-click="() =&gt; setMetric(key)">请求数</button></div></div><div class="oqc-chart" data-size="compact"><div class="oqc-chartBody"><div class="oqc-yAxis"><span class="oqc-yTop">$1.00</span><span class="oqc-yMid">$0.50</span><span class="oqc-yBottom">$0</span></div><div class="oqc-plot"><span class="oqc-gridline" style="top:0"></span><span class="oqc-gridline" style="top:50%"></span><span class="oqc-gridline" style="top:100%"></span><div class="oqc-bars" role="img" aria-label="10-23 $0.42   10-24 $0.61   10-25 $0.28   10-26 $0.93   10-27 $0.55   10-28 $0.77   10-29 $0.34" on-mouse-move="(event) =&gt; {
+                  const rect = event.currentTarget.getBoundingClientRect()
+                  if (!rect.width) return
+                  const ratio = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width))
+                  const index = Math.min(rows.length - 1, Math.floor(ratio * rows.length))
+                  if (tip !== index) setTip(index)
+                }" on-mouse-leave="() =&gt; setTip(null)"><span class="oqc-barCol" data-on="false"><span class="oqc-barFill" style="height:42%;background:#2ea043"></span></span><span class="oqc-barCol" data-on="false"><span class="oqc-barFill" style="height:61%;background:#2ea043"></span></span><span class="oqc-barCol" data-on="false"><span class="oqc-barFill" style="height:28.000000000000004%;background:#2ea043"></span></span><span class="oqc-barCol" data-on="false"><span class="oqc-barFill" style="height:93%;background:#2ea043"></span></span><span class="oqc-barCol" data-on="false"><span class="oqc-barFill" style="height:55.00000000000001%;background:#2ea043"></span></span><span class="oqc-barCol" data-on="false"><span class="oqc-barFill" style="height:77%;background:#2ea043"></span></span><span class="oqc-barCol" data-on="false"><span class="oqc-barFill" style="height:34%;background:#2ea043"></span></span></div></div></div><div class="oqc-xAxis" data-dense="day"><span class="oqc-xTick">10/23</span><span class="oqc-xTick">10/24</span><span class="oqc-xTick">10/25</span><span class="oqc-xTick">10/26</span><span class="oqc-xTick">10/27</span><span class="oqc-xTick">10/28</span><span class="oqc-xTick">10/29</span></div></div></div></div><div class="oqc-slot" data-id="models" data-dragging="false" data-over="false"><div class="oqc-block" data-off="false"><div draggable data-grip="true" title="拖拽标题调整顺序" on-drag-start="(event) =&gt; {
+          const target = event.target
+          if (target &amp;&amp; target.closest &amp;&amp; target.closest('button,input,a')) {
+            event.preventDefault()
+            return
+          }
+          setDragging(id)
+          try {
+            event.dataTransfer.effectAllowed = 'move'
+            event.dataTransfer.setData('text/plain', id)
+          } catch {
+            /* 忽略：某些环境不给 dataTransfer */
+          }
+        }" on-drag-end="() =&gt; {
+          setDragging(null)
+          setDropAt(null)
+        }" class="oqc-blockHead"><span class="oqc-blockTick"></span><span class="oqc-blockTitle">模型</span><span class="oqc-blockRule"></span></div><div class="oqc-models"><div class="oqc-modelRow"><span class="oqc-modelName" title="claude-sonnet-4-5">claude-sonnet-4-5</span><span class="oqc-modelBar"><span class="oqc-modelFill" style="width:100%;background:#2ea043"></span></span><span class="oqc-modelCost"><span class="oqc-cur">$</span><span >1.86</span></span></div><div class="oqc-modelRow"><span class="oqc-modelName" title="gpt-5.1-codex">gpt-5.1-codex</span><span class="oqc-modelBar"><span class="oqc-modelFill" style="width:49%;background:#2ea043"></span></span><span class="oqc-modelCost"><span class="oqc-cur">$</span><span >0.92</span></span></div><div class="oqc-modelRow"><span class="oqc-modelName" title="deepseek-v4.1-flash">deepseek-v4.1-flash</span><span class="oqc-modelBar"><span class="oqc-modelFill" style="width:22%;background:#2ea043"></span></span><span class="oqc-modelCost"><span class="oqc-cur">$</span><span >0.41</span></span></div></div></div></div></div></div>
+  </div><div class="col">
+    <div class="cap">Go + 按量都有<span>与「只有 Go」同渲染</span></div>
+    <div class="pane"><div class="oqc-card" data-variant="sidebar" data-style="panel" on-drag-over="(event) =&gt; {
+        if (!dragging) return
+        event.preventDefault()
+        try {
+          event.dataTransfer.dropEffect = 'move'
+        } catch {
+          /* 忽略：只影响光标样式 */
+        }
+        const slot = slotAt(event)
+        if (!slot || slot.id === dragging || !sections[slot.id]) {
+          if (dropAt) setDropAt(null)
+          return
+        }
+        if (!dropAt || dropAt.id !== slot.id || dropAt.after !== slot.after) setDropAt(slot)
+      }" on-drop="(event) =&gt; {
+        if (!dragging) return
+        event.preventDefault()
+        const slot = slotAt(event)
+        if (slot &amp;&amp; slot.id !== dragging &amp;&amp; sections[slot.id]) moveTo(dragging, slot.id, slot.after)
+        setDragging(null)
+        setDropAt(null)
+      }"><div class="oqc-head"><div class="oqc-title"><span class="oqc-titleGroup"><span class="oqc-titleText">OpenCode Go</span><span class="oqc-metaText"><span class="oqc-metaLabel">更新于</span><span class="oqc-metaTime">2分钟前</span><span class="oqc-pop oqc-metaTip">每 1 分钟自动刷新</span></span></span><span class="oqc-headActions"><button type="button" class="oqc-refresh" data-busy="false" title="立即刷新" aria-label="立即刷新" on-click="() =&gt; api.refresh({ fresh: true })"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13 8a5 5 0 1 1-1.6-3.7M13 3v3h-3" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="oqc-refresh" title="打开设置" aria-label="打开设置" on-click="() =&gt; {}"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 5h7M12.5 5H14M2 11h2.5M8 11h6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><circle cx="10.5" cy="5" r="1.7" fill="none" stroke="currentColor" stroke-width="1.9"/><circle cx="5" cy="11" r="1.7" fill="none" stroke="currentColor" stroke-width="1.9"/></svg></button></span></div></div><div class="oqc-slot" data-id="today" data-dragging="false" data-over="false"><div class="oqc-block" data-off="false"><div draggable data-grip="true" title="拖拽标题调整顺序" on-drag-start="(event) =&gt; {
+          const target = event.target
+          if (target &amp;&amp; target.closest &amp;&amp; target.closest('button,input,a')) {
+            event.preventDefault()
+            return
+          }
+          setDragging(id)
+          try {
+            event.dataTransfer.effectAllowed = 'move'
+            event.dataTransfer.setData('text/plain', id)
+          } catch {
+            /* 忽略：某些环境不给 dataTransfer */
+          }
+        }" on-drag-end="() =&gt; {
+          setDragging(null)
+          setDropAt(null)
+        }" class="oqc-blockHead"><span class="oqc-blockTick"></span><span class="oqc-blockTitle">用量</span><span class="oqc-blockRule"></span></div><div class="oqc-gauge"><svg class="oqc-gaugeArc" viewBox="0 0 100 56" aria-hidden="true"><path d="M8 52A42 42 0 0 1 92 52" path-length="100" fill="none" stroke="currentColor" stroke-opacity="0.15" stroke-width="7" stroke-linecap="round"/><path d="M8 52A42 42 0 0 1 92 52" path-length="100" fill="none" stroke="var(--dsw-alias-brand-primary)" stroke-width="7" stroke-linecap="round" stroke-dasharray="92 100"/><text x="50" y="46" text-anchor="middle" font-size="11.5" font-weight="500" letter-spacing="-0.2" fill="currentColor">92%</text><text x="50" y="55" text-anchor="middle" font-size="6.5" fill="currentColor" fill-opacity="0.6">本月剩余</text></svg></div><div class="oqc-table"><div class="oqc-tr oqc-trHead"><span class="oqc-tlabel"></span><span class="oqc-td">花费</span><span class="oqc-td">请求数</span><span class="oqc-td">Tokens</span></div><div class="oqc-tr"><span class="oqc-tlabel">今日</span><span class="oqc-td"><span class="oqc-cur">$</span><span >3.90</span></span><span class="oqc-td"><span >483</span></span><span class="oqc-td"><span >12.2</span><span class="oqc-unit">M</span></span></div><div class="oqc-tr"><span class="oqc-tlabel">本周</span><span class="oqc-td"><span class="oqc-cur">$</span><span >3.90</span></span><span class="oqc-td"><span >640</span></span><span class="oqc-td"><span >6.8</span><span class="oqc-unit">M</span></span></div><div class="oqc-tr"><span class="oqc-tlabel">本月</span><span class="oqc-td"><span class="oqc-cur">$</span><span >3.90</span></span><span class="oqc-td"><span >483</span></span><span class="oqc-td"><span >12.2</span><span class="oqc-unit">M</span></span></div></div></div></div><div class="oqc-slot" data-id="quota" data-dragging="false" data-over="false"><div class="oqc-block" data-off="false"><div draggable data-grip="true" title="拖拽标题调整顺序" on-drag-start="(event) =&gt; {
+          const target = event.target
+          if (target &amp;&amp; target.closest &amp;&amp; target.closest('button,input,a')) {
+            event.preventDefault()
+            return
+          }
+          setDragging(id)
+          try {
+            event.dataTransfer.effectAllowed = 'move'
+            event.dataTransfer.setData('text/plain', id)
+          } catch {
+            /* 忽略：某些环境不给 dataTransfer */
+          }
+        }" on-drag-end="() =&gt; {
+          setDragging(null)
+          setDropAt(null)
+        }" class="oqc-blockHead"><span class="oqc-blockTick"></span><span class="oqc-blockTitle">额度重置时间</span><span class="oqc-blockRule"></span><span class="oqc-blockMeta"><span class="oqc-blockTag" style="color:var(--dsw-alias-brand-primary)">正常</span></span></div><div class="oqc-rows"><div class="oqc-row" title="正常"><div class="oqc-top"><span class="oqc-name">滚动</span><span class="oqc-reset"><span class="oqc-dur">1小时21分</span><span class="oqc-resetWord">后重置</span></span><span class="oqc-pct"><span class="oqc-pctNum">34<span class="oqc-pctSign">%</span></span><span class="oqc-pctUnit">已用</span></span></div><div class="oqc-bar"><div class="oqc-fill" style="width:34%;background:var(--dsw-alias-brand-primary)"></div></div></div><div class="oqc-row" title="正常"><div class="oqc-top"><span class="oqc-name">本周</span><span class="oqc-reset"><span class="oqc-dur">4天3小时</span><span class="oqc-resetWord">后重置</span></span><span class="oqc-pct"><span class="oqc-pctNum">21<span class="oqc-pctSign">%</span></span><span class="oqc-pctUnit">已用</span></span></div><div class="oqc-bar"><div class="oqc-fill" style="width:21%;background:var(--dsw-alias-brand-primary)"></div></div></div><div class="oqc-row" title="正常"><div class="oqc-top"><span class="oqc-name">本月</span><span class="oqc-reset"><span class="oqc-dur">28天23小时</span><span class="oqc-resetWord">后重置</span></span><span class="oqc-pct"><span class="oqc-pctNum">8<span class="oqc-pctSign">%</span></span><span class="oqc-pctUnit">已用</span></span></div><div class="oqc-bar"><div class="oqc-fill" style="width:8%;background:var(--dsw-alias-brand-primary)"></div></div></div></div></div></div><div class="oqc-slot" data-id="forecast" data-dragging="false" data-over="false"><div class="oqc-block" data-off="false"><div draggable data-grip="true" title="拖拽标题调整顺序" on-drag-start="(event) =&gt; {
+          const target = event.target
+          if (target &amp;&amp; target.closest &amp;&amp; target.closest('button,input,a')) {
+            event.preventDefault()
+            return
+          }
+          setDragging(id)
+          try {
+            event.dataTransfer.effectAllowed = 'move'
+            event.dataTransfer.setData('text/plain', id)
+          } catch {
+            /* 忽略：某些环境不给 dataTransfer */
+          }
+        }" on-drag-end="() =&gt; {
+          setDragging(null)
+          setDropAt(null)
+        }" class="oqc-blockHead"><span class="oqc-blockTick"></span><span class="oqc-blockTitle">月度预测</span><span class="oqc-blockRule"></span><span class="oqc-blockMeta">日均 4.0%</span></div><div class="oqc-chart oqc-forecast" data-size="compact"><div class="oqc-chartBody"><div class="oqc-yAxis"><span class="oqc-yBottom">0%</span><span class="oqc-yMid" style="top:33.33333333333334%">100%</span><span class="oqc-yTop">150%</span></div><div class="oqc-plot" on-mouse-move="(event) =&gt; {
+                const rect = event.currentTarget.getBoundingClientRect()
+                if (!rect.width) return
+                const ratio = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width))
+                const target = periodStart + ratio * (resetAt - periodStart)
+                let best = hoverPoints[0]
+                for (const point of hoverPoints) {
+                  if (Math.abs(point.at - target) &lt; Math.abs(best.at - target)) best = point
+                }
+                setTip(tipFor(best))
+              }" on-mouse-leave="() =&gt; setTip(null)"><span class="oqc-gridline" style="top:0%"></span><span class="oqc-gridline" style="top:100%"></span><span class="oqc-vline" style="left:40.71565930219534%"></span><span class="oqc-vline" style="left:81.43131860439068%"></span><span class="oqc-limitLine" style="top:66.66666666666667%"></span><span class="oqc-limitLine" style="top:33.33333333333334%"></span><svg class="oqc-spark" viewBox="0 0 100 100" preserve-aspect-ratio="none" role="img"><path d="M0.00,100.00 L0.00,99.43 L0.00,98.59 L0.00,98.21 L0.00,96.94 L2.09,96.18 L5.32,95.13 L6.51,94.67 L6.51,100 L0.00,100 Z" fill="#2ea043" opacity="0.12"/><path d="M0.00,100.00 L0.00,99.43 L0.00,98.59 L0.00,98.21 L0.00,96.94 L2.09,96.18 L5.32,95.13 L6.51,94.67" fill="none" stroke="#2ea043" stroke-width="1.6" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"/><path d="M6.51,94.67 L100,18.13" fill="none" stroke="#d9822b" stroke-width="1.4" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"/></svg><span class="oqc-dot" style="left:0%;top:100%;background:#2ea043;width:3.5px;height:3.5px"></span><span class="oqc-dot" style="left:0%;top:99.42564102564103%;background:#2ea043;width:3.5px;height:3.5px"></span><span class="oqc-dot" style="left:0%;top:98.591452991453%;background:#2ea043;width:3.5px;height:3.5px"></span><span class="oqc-dot" style="left:0%;top:98.20854700854701%;background:#2ea043;width:3.5px;height:3.5px"></span><span class="oqc-dot" style="left:0%;top:96.93675213675213%;background:#2ea043;width:3.5px;height:3.5px"></span><span class="oqc-dot" style="left:2.0904644563918757%;top:96.18461538461538%;background:#2ea043;width:3.5px;height:3.5px"></span><span class="oqc-dot" style="left:5.316270908004779%;top:95.13162393162393%;background:#2ea043;width:3.5px;height:3.5px"></span><span class="oqc-dot" style="left:6.514505488351255%;top:94.66666666666667%;background:#2ea043;width:6px;height:6px"></span><span class="oqc-dot" style="left:100%;top:18.131416991358805%;background:#d9822b;width:6px;height:6px"></span><span class="oqc-hitDot" style="left:40.71565930219534%;top:66.66666666666667%"></span><span class="oqc-hitDot" style="left:81.43131860439068%;top:33.33333333333334%"></span><span class="oqc-mark oqc-markSide" style="left:100%;top:18.131416991358805%">123%</span></div></div><div class="oqc-xAxis"><span class="oqc-xStart">10/27</span><span class="oqc-xMark" style="left:40.71565930219534%">11/9</span><span class="oqc-xMark" style="left:81.43131860439068%">11/21</span><span class="oqc-xEnd">11/27</span></div><div class="oqc-legend"><span class="oqc-legendItem"><i class="oqc-legendMark" style="background:#2ea043"></i>实测</span><span class="oqc-legendItem"><i class="oqc-legendMark" style="background:#d9822b"></i>预测</span></div></div></div></div><div class="oqc-slot" data-id="trend" data-dragging="false" data-over="false"><div class="oqc-block" data-off="false"><div draggable data-grip="true" title="拖拽标题调整顺序" on-drag-start="(event) =&gt; {
+          const target = event.target
+          if (target &amp;&amp; target.closest &amp;&amp; target.closest('button,input,a')) {
+            event.preventDefault()
+            return
+          }
+          setDragging(id)
+          try {
+            event.dataTransfer.effectAllowed = 'move'
+            event.dataTransfer.setData('text/plain', id)
+          } catch {
+            /* 忽略：某些环境不给 dataTransfer */
+          }
+        }" on-drag-end="() =&gt; {
+          setDragging(null)
+          setDropAt(null)
+        }" class="oqc-blockHead"><span class="oqc-blockTick"></span><span class="oqc-blockTitle">趋势</span><span class="oqc-blockRule"></span><span class="oqc-blockMeta"><div class="oqc-seg"><button type="button" class="oqc-segBtn" aria-pressed="true" on-click="() =&gt; setRange(key)">7 天</button><button type="button" class="oqc-segBtn" on-click="() =&gt; setRange(key)">24 小时</button></div></span></div><div class="oqc-controls"><div class="oqc-seg"><button type="button" class="oqc-segBtn" aria-pressed="true" on-click="() =&gt; setMetric(key)">花费</button><button type="button" class="oqc-segBtn" on-click="() =&gt; setMetric(key)">Tokens</button><button type="button" class="oqc-segBtn" on-click="() =&gt; setMetric(key)">请求数</button></div></div><div class="oqc-chart" data-size="compact"><div class="oqc-chartBody"><div class="oqc-yAxis"><span class="oqc-yTop">$1.00</span><span class="oqc-yMid">$0.50</span><span class="oqc-yBottom">$0</span></div><div class="oqc-plot"><span class="oqc-gridline" style="top:0"></span><span class="oqc-gridline" style="top:50%"></span><span class="oqc-gridline" style="top:100%"></span><div class="oqc-bars" role="img" aria-label="10-23 $0.42   10-24 $0.61   10-25 $0.28   10-26 $0.93   10-27 $0.55   10-28 $0.77   10-29 $0.34" on-mouse-move="(event) =&gt; {
+                  const rect = event.currentTarget.getBoundingClientRect()
+                  if (!rect.width) return
+                  const ratio = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width))
+                  const index = Math.min(rows.length - 1, Math.floor(ratio * rows.length))
+                  if (tip !== index) setTip(index)
+                }" on-mouse-leave="() =&gt; setTip(null)"><span class="oqc-barCol" data-on="false"><span class="oqc-barFill" style="height:42%;background:#2ea043"></span></span><span class="oqc-barCol" data-on="false"><span class="oqc-barFill" style="height:61%;background:#2ea043"></span></span><span class="oqc-barCol" data-on="false"><span class="oqc-barFill" style="height:28.000000000000004%;background:#2ea043"></span></span><span class="oqc-barCol" data-on="false"><span class="oqc-barFill" style="height:93%;background:#2ea043"></span></span><span class="oqc-barCol" data-on="false"><span class="oqc-barFill" style="height:55.00000000000001%;background:#2ea043"></span></span><span class="oqc-barCol" data-on="false"><span class="oqc-barFill" style="height:77%;background:#2ea043"></span></span><span class="oqc-barCol" data-on="false"><span class="oqc-barFill" style="height:34%;background:#2ea043"></span></span></div></div></div><div class="oqc-xAxis" data-dense="day"><span class="oqc-xTick">10/23</span><span class="oqc-xTick">10/24</span><span class="oqc-xTick">10/25</span><span class="oqc-xTick">10/26</span><span class="oqc-xTick">10/27</span><span class="oqc-xTick">10/28</span><span class="oqc-xTick">10/29</span></div></div></div></div><div class="oqc-slot" data-id="models" data-dragging="false" data-over="false"><div class="oqc-block" data-off="false"><div draggable data-grip="true" title="拖拽标题调整顺序" on-drag-start="(event) =&gt; {
+          const target = event.target
+          if (target &amp;&amp; target.closest &amp;&amp; target.closest('button,input,a')) {
+            event.preventDefault()
+            return
+          }
+          setDragging(id)
+          try {
+            event.dataTransfer.effectAllowed = 'move'
+            event.dataTransfer.setData('text/plain', id)
+          } catch {
+            /* 忽略：某些环境不给 dataTransfer */
+          }
+        }" on-drag-end="() =&gt; {
+          setDragging(null)
+          setDropAt(null)
+        }" class="oqc-blockHead"><span class="oqc-blockTick"></span><span class="oqc-blockTitle">模型</span><span class="oqc-blockRule"></span></div><div class="oqc-models"><div class="oqc-modelRow"><span class="oqc-modelName" title="claude-sonnet-4-5">claude-sonnet-4-5</span><span class="oqc-modelBar"><span class="oqc-modelFill" style="width:100%;background:#2ea043"></span></span><span class="oqc-modelCost"><span class="oqc-cur">$</span><span >1.86</span></span></div><div class="oqc-modelRow"><span class="oqc-modelName" title="gpt-5.1-codex">gpt-5.1-codex</span><span class="oqc-modelBar"><span class="oqc-modelFill" style="width:49%;background:#2ea043"></span></span><span class="oqc-modelCost"><span class="oqc-cur">$</span><span >0.92</span></span></div><div class="oqc-modelRow"><span class="oqc-modelName" title="deepseek-v4.1-flash">deepseek-v4.1-flash</span><span class="oqc-modelBar"><span class="oqc-modelFill" style="width:22%;background:#2ea043"></span></span><span class="oqc-modelCost"><span class="oqc-cur">$</span><span >0.41</span></span></div></div></div></div></div></div>
+  </div></div>
+</div>
+<div class="sec">
+  <div class="secTitle">B · 每个分块的空态<span>同一分块的不同空态逐条列出</span></div>
+  <div class="stateRow">
+    <div class="stateHead">额度<span>3 种状态</span></div>
+    <div class="cells"><figure class="cell"><div class="oqc-card oqc-shim"><div class="oqc-slot" data-id="quota" data-dragging="false" data-over="false"><div class="oqc-block" data-off="false"><div draggable data-grip="true" title="拖拽标题调整顺序" on-drag-start="(event) =&gt; {
+          const target = event.target
+          if (target &amp;&amp; target.closest &amp;&amp; target.closest('button,input,a')) {
+            event.preventDefault()
+            return
+          }
+          setDragging(id)
+          try {
+            event.dataTransfer.effectAllowed = 'move'
+            event.dataTransfer.setData('text/plain', id)
+          } catch {
+            /* 忽略：某些环境不给 dataTransfer */
+          }
+        }" on-drag-end="() =&gt; {
+          setDragging(null)
+          setDropAt(null)
+        }" class="oqc-blockHead"><span class="oqc-blockTick"></span><span class="oqc-blockTitle">额度重置时间</span><span class="oqc-blockRule"></span><span class="oqc-blockMeta"><span class="oqc-blockTag" style="color:var(--dsw-alias-brand-primary)">正常</span></span></div><div class="oqc-rows"><div class="oqc-row" title="正常"><div class="oqc-top"><span class="oqc-name">滚动</span><span class="oqc-reset"><span class="oqc-dur">1小时21分</span><span class="oqc-resetWord">后重置</span></span><span class="oqc-pct"><span class="oqc-pctNum">34<span class="oqc-pctSign">%</span></span><span class="oqc-pctUnit">已用</span></span></div><div class="oqc-bar"><div class="oqc-fill" style="width:34%;background:var(--dsw-alias-brand-primary)"></div></div></div><div class="oqc-row" title="正常"><div class="oqc-top"><span class="oqc-name">本周</span><span class="oqc-reset"><span class="oqc-dur">4天3小时</span><span class="oqc-resetWord">后重置</span></span><span class="oqc-pct"><span class="oqc-pctNum">21<span class="oqc-pctSign">%</span></span><span class="oqc-pctUnit">已用</span></span></div><div class="oqc-bar"><div class="oqc-fill" style="width:21%;background:var(--dsw-alias-brand-primary)"></div></div></div><div class="oqc-row" title="正常"><div class="oqc-top"><span class="oqc-name">本月</span><span class="oqc-reset"><span class="oqc-dur">28天23小时</span><span class="oqc-resetWord">后重置</span></span><span class="oqc-pct"><span class="oqc-pctNum">8<span class="oqc-pctSign">%</span></span><span class="oqc-pctUnit">已用</span></span></div><div class="oqc-bar"><div class="oqc-fill" style="width:8%;background:var(--dsw-alias-brand-primary)"></div></div></div></div></div></div></div><figcaption><b>正常</b>· 三个窗口都拿到百分比</figcaption></figure><figure class="cell"><div class="oqc-card oqc-shim"><div class="oqc-slot" data-id="quota" data-dragging="false" data-over="false"><div class="oqc-block" data-off="false"><div draggable data-grip="true" title="拖拽标题调整顺序" on-drag-start="(event) =&gt; {
+          const target = event.target
+          if (target &amp;&amp; target.closest &amp;&amp; target.closest('button,input,a')) {
+            event.preventDefault()
+            return
+          }
+          setDragging(id)
+          try {
+            event.dataTransfer.effectAllowed = 'move'
+            event.dataTransfer.setData('text/plain', id)
+          } catch {
+            /* 忽略：某些环境不给 dataTransfer */
+          }
+        }" on-drag-end="() =&gt; {
+          setDragging(null)
+          setDropAt(null)
+        }" class="oqc-blockHead"><span class="oqc-blockTick"></span><span class="oqc-blockTitle">额度重置时间</span><span class="oqc-blockRule"></span></div><div class="oqc-rows"><div class="oqc-row" title="正常"><div class="oqc-top"><span class="oqc-name">滚动</span><span class="oqc-reset"><span class="oqc-dur">1小时21分</span><span class="oqc-resetWord">后重置</span></span><span class="oqc-pct"><span class="oqc-pctNum">—</span></span></div><div class="oqc-bar"><div class="oqc-fill" style="width:0%;background:var(--dsw-alias-brand-primary)"></div></div></div><div class="oqc-row" title="正常"><div class="oqc-top"><span class="oqc-name">本周</span><span class="oqc-reset"><span class="oqc-dur">4天3小时</span><span class="oqc-resetWord">后重置</span></span><span class="oqc-pct"><span class="oqc-pctNum">—</span></span></div><div class="oqc-bar"><div class="oqc-fill" style="width:0%;background:var(--dsw-alias-brand-primary)"></div></div></div><div class="oqc-row" title="正常"><div class="oqc-top"><span class="oqc-name">本月</span><span class="oqc-reset"><span class="oqc-dur">28天23小时</span><span class="oqc-resetWord">后重置</span></span><span class="oqc-pct"><span class="oqc-pctNum">—</span></span></div><div class="oqc-bar"><div class="oqc-fill" style="width:0%;background:var(--dsw-alias-brand-primary)"></div></div></div></div></div></div></div><figcaption><b>百分比缺失</b>· 窗口在、percent 没取到，一律显示 —</figcaption></figure><figure class="cell"><div class="oqc-card oqc-shim"><div class="oqc-block" data-off="true">
+  <div class="oqc-blockHead"><span class="oqc-blockTick"></span><span class="oqc-blockTitle">额度重置时间</span><span class="oqc-blockRule"></span><span class="oqc-blockMeta">不适用</span></div>
+  <p class="oqc-empty">没有 Go 订阅，没有额度窗口</p>
+</div></div><figcaption><b>无订阅</b>· 整块隐藏</figcaption></figure></div>
+  </div><div class="stateRow">
+    <div class="stateHead">用量<span>3 种状态</span></div>
+    <div class="cells"><figure class="cell"><div class="oqc-card oqc-shim"><div class="oqc-slot" data-id="today" data-dragging="false" data-over="false"><div class="oqc-block" data-off="false"><div draggable data-grip="true" title="拖拽标题调整顺序" on-drag-start="(event) =&gt; {
+          const target = event.target
+          if (target &amp;&amp; target.closest &amp;&amp; target.closest('button,input,a')) {
+            event.preventDefault()
+            return
+          }
+          setDragging(id)
+          try {
+            event.dataTransfer.effectAllowed = 'move'
+            event.dataTransfer.setData('text/plain', id)
+          } catch {
+            /* 忽略：某些环境不给 dataTransfer */
+          }
+        }" on-drag-end="() =&gt; {
+          setDragging(null)
+          setDropAt(null)
+        }" class="oqc-blockHead"><span class="oqc-blockTick"></span><span class="oqc-blockTitle">用量</span><span class="oqc-blockRule"></span></div><div class="oqc-gauge"><svg class="oqc-gaugeArc" viewBox="0 0 100 56" aria-hidden="true"><path d="M8 52A42 42 0 0 1 92 52" path-length="100" fill="none" stroke="currentColor" stroke-opacity="0.15" stroke-width="7" stroke-linecap="round"/><path d="M8 52A42 42 0 0 1 92 52" path-length="100" fill="none" stroke="var(--dsw-alias-brand-primary)" stroke-width="7" stroke-linecap="round" stroke-dasharray="92 100"/><text x="50" y="46" text-anchor="middle" font-size="11.5" font-weight="500" letter-spacing="-0.2" fill="currentColor">92%</text><text x="50" y="55" text-anchor="middle" font-size="6.5" fill="currentColor" fill-opacity="0.6">本月剩余</text></svg></div><div class="oqc-table"><div class="oqc-tr oqc-trHead"><span class="oqc-tlabel"></span><span class="oqc-td">花费</span><span class="oqc-td">请求数</span><span class="oqc-td">Tokens</span></div><div class="oqc-tr"><span class="oqc-tlabel">今日</span><span class="oqc-td"><span class="oqc-cur">$</span><span >3.90</span></span><span class="oqc-td"><span >483</span></span><span class="oqc-td"><span >12.2</span><span class="oqc-unit">M</span></span></div><div class="oqc-tr"><span class="oqc-tlabel">本周</span><span class="oqc-td"><span class="oqc-cur">$</span><span >3.90</span></span><span class="oqc-td"><span >640</span></span><span class="oqc-td"><span >6.8</span><span class="oqc-unit">M</span></span></div><div class="oqc-tr"><span class="oqc-tlabel">本月</span><span class="oqc-td"><span class="oqc-cur">$</span><span >3.90</span></span><span class="oqc-td"><span >483</span></span><span class="oqc-td"><span >12.2</span><span class="oqc-unit">M</span></span></div></div></div></div></div><figcaption><b>正常</b>· 有月度额度，油表 + 三行</figcaption></figure><figure class="cell"><div class="oqc-card oqc-shim"><div class="oqc-slot" data-id="today" data-dragging="false" data-over="false"><div class="oqc-block" data-off="false"><div draggable data-grip="true" title="拖拽标题调整顺序" on-drag-start="(event) =&gt; {
+          const target = event.target
+          if (target &amp;&amp; target.closest &amp;&amp; target.closest('button,input,a')) {
+            event.preventDefault()
+            return
+          }
+          setDragging(id)
+          try {
+            event.dataTransfer.effectAllowed = 'move'
+            event.dataTransfer.setData('text/plain', id)
+          } catch {
+            /* 忽略：某些环境不给 dataTransfer */
+          }
+        }" on-drag-end="() =&gt; {
+          setDragging(null)
+          setDropAt(null)
+        }" class="oqc-blockHead"><span class="oqc-blockTick"></span><span class="oqc-blockTitle">用量</span><span class="oqc-blockRule"></span></div><div class="oqc-table"><div class="oqc-tr oqc-trHead"><span class="oqc-tlabel"></span><span class="oqc-td">花费</span><span class="oqc-td">请求数</span><span class="oqc-td">Tokens</span></div><div class="oqc-tr"><span class="oqc-tlabel">今日</span><span class="oqc-td"><span class="oqc-cur">$</span><span >3.90</span></span><span class="oqc-td"><span >483</span></span><span class="oqc-td"><span >12.2</span><span class="oqc-unit">M</span></span></div><div class="oqc-tr"><span class="oqc-tlabel">本周</span><span class="oqc-td"><span class="oqc-cur">$</span><span >3.90</span></span><span class="oqc-td"><span >640</span></span><span class="oqc-td"><span >6.8</span><span class="oqc-unit">M</span></span></div></div></div></div></div><figcaption><b>无月度额度</b>· 按量计费：不画油表，只留表格</figcaption></figure><figure class="cell"><div class="oqc-card oqc-shim"><div class="oqc-block" data-off="true">
+  <div class="oqc-blockHead"><span class="oqc-blockTick"></span><span class="oqc-blockTitle">用量</span><span class="oqc-blockRule"></span><span class="oqc-blockMeta">不适用</span></div>
+  <p class="oqc-empty">还没有任何用量记录</p>
+</div></div><figcaption><b>无用量</b>· 整块隐藏</figcaption></figure></div>
+  </div><div class="stateRow">
+    <div class="stateHead">预测<span>3 种状态</span></div>
+    <div class="cells"><figure class="cell"><div class="oqc-card oqc-shim"><div class="oqc-slot" data-id="forecast" data-dragging="false" data-over="false"><div class="oqc-block" data-off="false"><div draggable data-grip="true" title="拖拽标题调整顺序" on-drag-start="(event) =&gt; {
+          const target = event.target
+          if (target &amp;&amp; target.closest &amp;&amp; target.closest('button,input,a')) {
+            event.preventDefault()
+            return
+          }
+          setDragging(id)
+          try {
+            event.dataTransfer.effectAllowed = 'move'
+            event.dataTransfer.setData('text/plain', id)
+          } catch {
+            /* 忽略：某些环境不给 dataTransfer */
+          }
+        }" on-drag-end="() =&gt; {
+          setDragging(null)
+          setDropAt(null)
+        }" class="oqc-blockHead"><span class="oqc-blockTick"></span><span class="oqc-blockTitle">月度预测</span><span class="oqc-blockRule"></span><span class="oqc-blockMeta">日均 4.0%</span></div><div class="oqc-chart oqc-forecast" data-size="compact"><div class="oqc-chartBody"><div class="oqc-yAxis"><span class="oqc-yBottom">0%</span><span class="oqc-yMid" style="top:33.33333333333334%">100%</span><span class="oqc-yTop">150%</span></div><div class="oqc-plot" on-mouse-move="(event) =&gt; {
+                const rect = event.currentTarget.getBoundingClientRect()
+                if (!rect.width) return
+                const ratio = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width))
+                const target = periodStart + ratio * (resetAt - periodStart)
+                let best = hoverPoints[0]
+                for (const point of hoverPoints) {
+                  if (Math.abs(point.at - target) &lt; Math.abs(best.at - target)) best = point
+                }
+                setTip(tipFor(best))
+              }" on-mouse-leave="() =&gt; setTip(null)"><span class="oqc-gridline" style="top:0%"></span><span class="oqc-gridline" style="top:100%"></span><span class="oqc-vline" style="left:40.71566000224014%"></span><span class="oqc-vline" style="left:81.43132000448028%"></span><span class="oqc-limitLine" style="top:66.66666666666667%"></span><span class="oqc-limitLine" style="top:33.33333333333334%"></span><svg class="oqc-spark" viewBox="0 0 100 100" preserve-aspect-ratio="none" role="img"><path d="M0.00,100.00 L0.00,99.43 L0.00,98.59 L0.00,98.21 L0.00,96.94 L2.09,96.18 L5.32,95.13 L6.51,94.67 L6.51,100 L0.00,100 Z" fill="#2ea043" opacity="0.12"/><path d="M0.00,100.00 L0.00,99.43 L0.00,98.59 L0.00,98.21 L0.00,96.94 L2.09,96.18 L5.32,95.13 L6.51,94.67" fill="none" stroke="#2ea043" stroke-width="1.6" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"/><path d="M6.51,94.67 L100,18.13" fill="none" stroke="#d9822b" stroke-width="1.4" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"/></svg><span class="oqc-dot" style="left:0%;top:100%;background:#2ea043;width:3.5px;height:3.5px"></span><span class="oqc-dot" style="left:0%;top:99.42564102564103%;background:#2ea043;width:3.5px;height:3.5px"></span><span class="oqc-dot" style="left:0%;top:98.591452991453%;background:#2ea043;width:3.5px;height:3.5px"></span><span class="oqc-dot" style="left:0%;top:98.20854700854701%;background:#2ea043;width:3.5px;height:3.5px"></span><span class="oqc-dot" style="left:0%;top:96.93675213675213%;background:#2ea043;width:3.5px;height:3.5px"></span><span class="oqc-dot" style="left:2.0904644563918757%;top:96.18461538461538%;background:#2ea043;width:3.5px;height:3.5px"></span><span class="oqc-dot" style="left:5.316270908004779%;top:95.13162393162393%;background:#2ea043;width:3.5px;height:3.5px"></span><span class="oqc-dot" style="left:6.514505600358422%;top:94.66666666666667%;background:#2ea043;width:6px;height:6px"></span><span class="oqc-dot" style="left:100%;top:18.13141839896649%;background:#d9822b;width:6px;height:6px"></span><span class="oqc-hitDot" style="left:40.71566000224014%;top:66.66666666666667%"></span><span class="oqc-hitDot" style="left:81.43132000448028%;top:33.33333333333334%"></span><span class="oqc-mark oqc-markSide" style="left:100%;top:18.13141839896649%">123%</span></div></div><div class="oqc-xAxis"><span class="oqc-xStart">10/27</span><span class="oqc-xMark" style="left:40.71566000224014%">11/9</span><span class="oqc-xMark" style="left:81.43132000448028%">11/21</span><span class="oqc-xEnd">11/27</span></div><div class="oqc-legend"><span class="oqc-legendItem"><i class="oqc-legendMark" style="background:#2ea043"></i>实测</span><span class="oqc-legendItem"><i class="oqc-legendMark" style="background:#d9822b"></i>预测</span></div></div></div></div></div><figcaption><b>正常</b>· 实测曲线 + 预测虚线</figcaption></figure><figure class="cell"><div class="oqc-card oqc-shim"><div class="oqc-block" data-off="true">
+  <div class="oqc-blockHead"><span class="oqc-blockTick"></span><span class="oqc-blockTitle">月度预测</span><span class="oqc-blockRule"></span><span class="oqc-blockMeta">不适用</span></div>
+  <p class="oqc-empty">没有月度额度，无从预测</p>
+</div></div><figcaption><b>无月度额度</b>· 整块隐藏</figcaption></figure><figure class="cell"><div class="oqc-card oqc-shim"><div class="oqc-block" data-off="true">
+  <div class="oqc-blockHead"><span class="oqc-blockTick"></span><span class="oqc-blockTitle">月度预测</span><span class="oqc-blockRule"></span><span class="oqc-blockMeta">不适用</span></div>
+  <p class="oqc-empty">用量历史不足，画不出趋势</p>
+</div></div><figcaption><b>采样不足</b>· 历史不足两个点，画不出斜率</figcaption></figure></div>
+  </div><div class="stateRow">
+    <div class="stateHead">趋势<span>2 种状态</span></div>
+    <div class="cells"><figure class="cell"><div class="oqc-card oqc-shim"><div class="oqc-slot" data-id="trend" data-dragging="false" data-over="false"><div class="oqc-block" data-off="false"><div draggable data-grip="true" title="拖拽标题调整顺序" on-drag-start="(event) =&gt; {
+          const target = event.target
+          if (target &amp;&amp; target.closest &amp;&amp; target.closest('button,input,a')) {
+            event.preventDefault()
+            return
+          }
+          setDragging(id)
+          try {
+            event.dataTransfer.effectAllowed = 'move'
+            event.dataTransfer.setData('text/plain', id)
+          } catch {
+            /* 忽略：某些环境不给 dataTransfer */
+          }
+        }" on-drag-end="() =&gt; {
+          setDragging(null)
+          setDropAt(null)
+        }" class="oqc-blockHead"><span class="oqc-blockTick"></span><span class="oqc-blockTitle">趋势</span><span class="oqc-blockRule"></span><span class="oqc-blockMeta"><div class="oqc-seg"><button type="button" class="oqc-segBtn" aria-pressed="true" on-click="() =&gt; setRange(key)">7 天</button><button type="button" class="oqc-segBtn" on-click="() =&gt; setRange(key)">24 小时</button></div></span></div><div class="oqc-controls"><div class="oqc-seg"><button type="button" class="oqc-segBtn" aria-pressed="true" on-click="() =&gt; setMetric(key)">花费</button><button type="button" class="oqc-segBtn" on-click="() =&gt; setMetric(key)">Tokens</button><button type="button" class="oqc-segBtn" on-click="() =&gt; setMetric(key)">请求数</button></div></div><div class="oqc-chart" data-size="compact"><div class="oqc-chartBody"><div class="oqc-yAxis"><span class="oqc-yTop">$1.00</span><span class="oqc-yMid">$0.50</span><span class="oqc-yBottom">$0</span></div><div class="oqc-plot"><span class="oqc-gridline" style="top:0"></span><span class="oqc-gridline" style="top:50%"></span><span class="oqc-gridline" style="top:100%"></span><div class="oqc-bars" role="img" aria-label="10-23 $0.42   10-24 $0.61   10-25 $0.28   10-26 $0.93   10-27 $0.55   10-28 $0.77   10-29 $0.34" on-mouse-move="(event) =&gt; {
+                  const rect = event.currentTarget.getBoundingClientRect()
+                  if (!rect.width) return
+                  const ratio = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width))
+                  const index = Math.min(rows.length - 1, Math.floor(ratio * rows.length))
+                  if (tip !== index) setTip(index)
+                }" on-mouse-leave="() =&gt; setTip(null)"><span class="oqc-barCol" data-on="false"><span class="oqc-barFill" style="height:42%;background:#2ea043"></span></span><span class="oqc-barCol" data-on="false"><span class="oqc-barFill" style="height:61%;background:#2ea043"></span></span><span class="oqc-barCol" data-on="false"><span class="oqc-barFill" style="height:28.000000000000004%;background:#2ea043"></span></span><span class="oqc-barCol" data-on="false"><span class="oqc-barFill" style="height:93%;background:#2ea043"></span></span><span class="oqc-barCol" data-on="false"><span class="oqc-barFill" style="height:55.00000000000001%;background:#2ea043"></span></span><span class="oqc-barCol" data-on="false"><span class="oqc-barFill" style="height:77%;background:#2ea043"></span></span><span class="oqc-barCol" data-on="false"><span class="oqc-barFill" style="height:34%;background:#2ea043"></span></span></div></div></div><div class="oqc-xAxis" data-dense="day"><span class="oqc-xTick">10/23</span><span class="oqc-xTick">10/24</span><span class="oqc-xTick">10/25</span><span class="oqc-xTick">10/26</span><span class="oqc-xTick">10/27</span><span class="oqc-xTick">10/28</span><span class="oqc-xTick">10/29</span></div></div></div></div></div><figcaption><b>正常</b>· 固定 7 根按天</figcaption></figure><figure class="cell"><div class="oqc-card oqc-shim"><div class="oqc-slot" data-id="trend" data-dragging="false" data-over="false"><div class="oqc-block" data-off="false"><div draggable data-grip="true" title="拖拽标题调整顺序" on-drag-start="(event) =&gt; {
+          const target = event.target
+          if (target &amp;&amp; target.closest &amp;&amp; target.closest('button,input,a')) {
+            event.preventDefault()
+            return
+          }
+          setDragging(id)
+          try {
+            event.dataTransfer.effectAllowed = 'move'
+            event.dataTransfer.setData('text/plain', id)
+          } catch {
+            /* 忽略：某些环境不给 dataTransfer */
+          }
+        }" on-drag-end="() =&gt; {
+          setDragging(null)
+          setDropAt(null)
+        }" class="oqc-blockHead"><span class="oqc-blockTick"></span><span class="oqc-blockTitle">趋势</span><span class="oqc-blockRule"></span><span class="oqc-blockMeta"><div class="oqc-seg"><button type="button" class="oqc-segBtn" aria-pressed="true" on-click="() =&gt; setRange(key)">7 天</button><button type="button" class="oqc-segBtn" on-click="() =&gt; setRange(key)">24 小时</button></div></span></div><div class="oqc-controls"><div class="oqc-seg"><button type="button" class="oqc-segBtn" aria-pressed="true" on-click="() =&gt; setMetric(key)">花费</button><button type="button" class="oqc-segBtn" on-click="() =&gt; setMetric(key)">Tokens</button><button type="button" class="oqc-segBtn" on-click="() =&gt; setMetric(key)">请求数</button></div></div><p class="oqc-empty">这段时间没有用量数据</p></div></div></div><figcaption><b>无数据</b>· 留文案，块不消失</figcaption></figure></div>
+  </div><div class="stateRow">
+    <div class="stateHead">模型<span>2 种状态</span></div>
+    <div class="cells"><figure class="cell"><div class="oqc-card oqc-shim"><div class="oqc-slot" data-id="models" data-dragging="false" data-over="false"><div class="oqc-block" data-off="false"><div draggable data-grip="true" title="拖拽标题调整顺序" on-drag-start="(event) =&gt; {
+          const target = event.target
+          if (target &amp;&amp; target.closest &amp;&amp; target.closest('button,input,a')) {
+            event.preventDefault()
+            return
+          }
+          setDragging(id)
+          try {
+            event.dataTransfer.effectAllowed = 'move'
+            event.dataTransfer.setData('text/plain', id)
+          } catch {
+            /* 忽略：某些环境不给 dataTransfer */
+          }
+        }" on-drag-end="() =&gt; {
+          setDragging(null)
+          setDropAt(null)
+        }" class="oqc-blockHead"><span class="oqc-blockTick"></span><span class="oqc-blockTitle">模型</span><span class="oqc-blockRule"></span></div><div class="oqc-models"><div class="oqc-modelRow"><span class="oqc-modelName" title="claude-sonnet-4-5">claude-sonnet-4-5</span><span class="oqc-modelBar"><span class="oqc-modelFill" style="width:100%;background:#2ea043"></span></span><span class="oqc-modelCost"><span class="oqc-cur">$</span><span >1.86</span></span></div><div class="oqc-modelRow"><span class="oqc-modelName" title="gpt-5.1-codex">gpt-5.1-codex</span><span class="oqc-modelBar"><span class="oqc-modelFill" style="width:49%;background:#2ea043"></span></span><span class="oqc-modelCost"><span class="oqc-cur">$</span><span >0.92</span></span></div><div class="oqc-modelRow"><span class="oqc-modelName" title="deepseek-v4.1-flash">deepseek-v4.1-flash</span><span class="oqc-modelBar"><span class="oqc-modelFill" style="width:22%;background:#2ea043"></span></span><span class="oqc-modelCost"><span class="oqc-cur">$</span><span >0.41</span></span></div></div></div></div></div><figcaption><b>正常</b>· 按花费排序，取前四</figcaption></figure><figure class="cell"><div class="oqc-card oqc-shim"><div class="oqc-block" data-off="true">
+  <div class="oqc-blockHead"><span class="oqc-blockTick"></span><span class="oqc-blockTitle">模型</span><span class="oqc-blockRule"></span><span class="oqc-blockMeta">不适用</span></div>
+  <p class="oqc-empty">还没有按模型计费记录</p>
+</div></div><figcaption><b>无记录</b>· 整块隐藏</figcaption></figure></div>
+  </div>
+</div>
+</body></html>
