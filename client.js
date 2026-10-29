@@ -97,13 +97,14 @@ window.__ModuleLoader__.load({
       nav: 'OpenCode 套餐',
       pageTitle: 'OpenCode 套餐',
       pageIntro:
-        'Key 沿用 DSH 里已配置的 opencode / opencode-go provider；额度来自 Go 订阅，花费与模型来自控制台接口。',
+        'Key 沿用 DSH 里已配置的 opencode / opencode-go provider。',
       configured: '已配置',
       missing: '未配置',
       accountCurrent: '当前',
       accountSwitch: '切换',
       accountSwitching: '切换中…',
       accountSwitchHint: '切换到 {name}',
+      accountMembers: '{n} 个服务账号',
       scopeLabel: '查看',
       scopeBoth: '全部',
       scopeGo: '只有 Go',
@@ -217,13 +218,14 @@ window.__ModuleLoader__.load({
       nav: 'OpenCode plan',
       pageTitle: 'OpenCode plan',
       pageIntro:
-        'Uses the opencode / opencode-go providers already configured in DSH; quota comes from the Go subscription, spend and models from the console API.',
+        'Uses the opencode / opencode-go providers already configured in DSH.',
       configured: 'Configured',
       missing: 'Not configured',
       accountCurrent: 'Current',
       accountSwitch: 'Switch',
       accountSwitching: 'Switching…',
       accountSwitchHint: 'Switch to {name}',
+      accountMembers: '{n} service accounts',
       scopeLabel: 'Scope',
       scopeBoth: 'All',
       scopeGo: 'Go only',
@@ -287,7 +289,7 @@ ${FONT_FACES}
 .oqc-card{--oqc-font:"OQC Noto Sans SC","Microsoft YaHei UI","Microsoft YaHei","PingFang SC","Hiragino Sans GB","Segoe UI",system-ui,sans-serif;font-family:var(--oqc-font);box-sizing:border-box;width:100%;display:flex;flex-direction:column;gap:9px;padding:11px 11px 9px;margin:2px 0 6px;border:.5px solid var(--dsw-alias-border-l2);border-radius:11px;background:color-mix(in srgb,var(--dsw-alias-bg-layer-3) 11%,transparent);padding-left:10px;padding-right:10px}
 .oqc-card[data-variant=full]{gap:12px;padding:18px 20px 16px;margin:0;border-radius:13px}
 /* 分块：标题（左侧色标 + 字距标题 + 渐隐分隔线 + 右侧数值）把内容切成独立章节。 */
-.oqc-block{--oqc-block-bg:color-mix(in srgb,var(--dsw-alias-bg-layer-3) 78%,transparent);--oqc-block-bg-hover:color-mix(in srgb,var(--dsw-alias-bg-layer-3) 96%,transparent);--oqc-block-border:color-mix(in srgb,var(--dsw-alias-label-primary) 22%,transparent);--oqc-block-border-hover:color-mix(in srgb,var(--dsw-alias-label-primary) 42%,transparent);display:flex;flex-direction:column;gap:7px;min-width:0;padding:9px;border-radius:9px;border:1px solid var(--oqc-block-border);background:var(--oqc-block-bg);box-shadow:0 1px 2px color-mix(in srgb,var(--dsw-alias-label-primary) 7%,transparent);transition:background-color 140ms ease,border-color 140ms ease}
+.oqc-block{--oqc-block-bg:color-mix(in srgb,var(--dsw-alias-bg-layer-3) 78%,transparent);--oqc-block-bg-hover:color-mix(in srgb,var(--dsw-alias-bg-layer-3) 96%,transparent);--oqc-block-border:color-mix(in srgb,var(--dsw-alias-label-primary) 22%,transparent);--oqc-block-border-hover:color-mix(in srgb,var(--dsw-alias-label-primary) 42%,transparent);display:flex;flex-direction:column;gap:10px;min-width:0;padding:10px 9px;border-radius:9px;border:1px solid var(--oqc-block-border);background:var(--oqc-block-bg);box-shadow:0 1px 2px color-mix(in srgb,var(--dsw-alias-label-primary) 7%,transparent);transition:background-color 140ms ease,border-color 140ms ease}
 .oqc-block:hover{--oqc-block-bg:var(--oqc-block-bg-hover);--oqc-block-border:var(--oqc-block-border-hover)}
 .oqc-block:hover .oqc-blockTick{background:color-mix(in srgb,var(--dsw-alias-label-primary) 62%,transparent)}
 .oqc-block:hover .oqc-blockTitle{color:var(--dsw-alias-label-primary)}
@@ -300,8 +302,7 @@ ${FONT_FACES}
 .oqc-blockHead[data-grip=true]{cursor:grab}
 .oqc-blockHead[data-grip=true]:active{cursor:grabbing}
 .oqc-card[data-style=rail] .oqc-block{--oqc-rail:#3b82f6;border-left:2px solid var(--oqc-rail);border-radius:8px}
-.oqc-card[data-style=rail] .oqc-block:hover{--oqc-rail:#60a5fa}
-.oqc-card[data-variant=full] .oqc-block{gap:10px;padding:12px 14px 14px;border-radius:11px}
+.oqc-card[data-variant=full] .oqc-block{gap:10px;padding:10px 14px;border-radius:11px}
 .oqc-blockHead{display:flex;align-items:center;gap:7px;min-width:0;min-height:12px}
 .oqc-card[data-variant=full] .oqc-blockHead{min-height:14px;gap:9px}
 .oqc-blockTick{flex:none;width:2px;height:9px;border-radius:1px;background:color-mix(in srgb,var(--dsw-alias-label-primary) 45%,transparent)}
@@ -331,6 +332,7 @@ ${FONT_FACES}
 @keyframes oqc-spin{to{transform:rotate(360deg)}}
 .oqc-quota{display:flex;flex-direction:column;gap:9px}
 .oqc-rows{display:flex;flex-direction:column;gap:10px}
+.oqc-rows>.oqc-row:last-child .oqc-bar{margin-bottom:2px}
 .oqc-card[data-variant=full] .oqc-rows{gap:16px}
 .oqc-row{display:flex;flex-direction:column;gap:5px}
 .oqc-card[data-variant=full] .oqc-row{gap:8px}
@@ -367,6 +369,7 @@ ${FONT_FACES}
 .oqc-spendMeta{display:flex;align-items:center;gap:10px;font-size:10px;line-height:1.4;color:var(--dsw-alias-label-tertiary)}
 .oqc-card[data-variant=full] .oqc-spendMeta{font-size:12px;gap:14px}
 .oqc-chart{display:flex;flex-direction:column;gap:5px}
+.oqc-chart.oqc-forecast{padding-top:4px}
 .oqc-chartBody{display:flex;gap:7px;min-width:0}
 .oqc-yAxis{position:relative;flex:none;width:30px;height:52px;font-size:9px;line-height:1;font-variant-numeric:tabular-nums;color:var(--dsw-alias-label-tertiary)}
 .oqc-yAxis>span{position:absolute;right:0;line-height:1}
@@ -384,7 +387,9 @@ ${FONT_FACES}
 .oqc-hitDot{position:absolute;width:6px;height:6px;border-radius:50%;background:#d9822b;transform:translate(-50%,-50%);box-shadow:0 0 0 2px color-mix(in srgb,#d9822b 25%,transparent)}
 .oqc-mark{position:absolute;transform:translate(-50%,-150%);padding:1px 4px;border-radius:4px;background:var(--dsw-alias-bg-layer-1,#fff);border:.5px solid var(--dsw-alias-border-l2);font-size:9px;line-height:1.3;white-space:nowrap;color:var(--dsw-alias-label-secondary);pointer-events:none}
 .oqc-markEnd{transform:translate(-100%,-150%)}
-.oqc-markSide{transform:translate(-118%,-50%)}
+.oqc-markEndTop{transform:translate(calc(-100% - 4px),0)}
+.oqc-markNow{transform:translate(-50%,-150%)}
+.oqc-markNow[data-low=true]{transform:translate(-50%,8px)}
 .oqc-tip.oqc-tip-start{transform:translate(0,-140%)}
 .oqc-tip.oqc-tip-center{transform:translate(-50%,-140%)}
 .oqc-tip.oqc-tip-end{transform:translate(-100%,-140%)}
@@ -423,7 +428,7 @@ ${FONT_FACES}
 .oqc-modelFill{display:block;height:100%;border-radius:999px}
 .oqc-modelCost{flex:none;font-family:inherit;font-variant-numeric:tabular-nums;color:var(--dsw-alias-label-primary)}
 .oqc-controls{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
-.oqc-check{flex:none;width:12px;height:12px;margin:0 2px 0 0;padding:0;accent-color:var(--dsw-alias-brand-primary);cursor:pointer}
+.oqc-check{flex:none;width:12px;height:12px;margin:0 2px 0 0;padding:0;accent-color:#2ea043;cursor:pointer}
 .oqc-block[data-off=true]{opacity:.45}
 .oqc-block[data-off=true]:hover{opacity:.7}
 .oqc-gauge{display:block;width:150px;height:84px;margin:0 auto 10px;align-self:center;font-family:inherit;color:var(--dsw-alias-label-primary)}
@@ -454,7 +459,7 @@ ${FONT_FACES}
 .oqc-barTipValue{font-size:11px;line-height:1.35;font-weight:500;color:var(--dsw-alias-label-primary);font-variant-numeric:tabular-nums}
 .oqc-barTip.oqc-barTipStart{transform:translate(0,0)}
 .oqc-barTip.oqc-barTipEnd{transform:translate(-100%,0)}
-.oqc-rail{display:grid;place-items:center;width:34px;height:34px;margin:0 auto 4px;border:.5px solid var(--dsw-alias-border-l2);border-radius:8px;background:color-mix(in srgb,var(--dsw-alias-bg-layer-3) 42%,transparent);color:var(--dsw-alias-label-secondary);font-family:inherit;font-size:10px;font-weight:500;font-variant-numeric:tabular-nums;cursor:pointer;transition:color 140ms ease,background 140ms ease}
+.oqc-rail{--oqc-font:"OQC Noto Sans SC","Microsoft YaHei UI","Microsoft YaHei","PingFang SC","Hiragino Sans GB","Segoe UI",system-ui,sans-serif;display:grid;place-items:center;width:34px;height:34px;margin:0 auto 4px;border:.5px solid var(--dsw-alias-border-l2);border-radius:8px;background:color-mix(in srgb,var(--dsw-alias-bg-layer-3) 42%,transparent);color:var(--dsw-alias-label-secondary);font-family:var(--oqc-font);font-size:10px;font-weight:500;font-variant-numeric:tabular-nums;cursor:pointer;transition:color 140ms ease,background 140ms ease}
 .oqc-rail:hover{color:var(--dsw-alias-label-primary);background:color-mix(in srgb,var(--dsw-alias-label-primary) 6%,transparent)}
 .oqc-rail:focus-visible{outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--dsw-alias-brand-primary) 26%,transparent)}
 .oqc-page{--oqc-font:"OQC Noto Sans SC","Microsoft YaHei UI","Microsoft YaHei","PingFang SC","Hiragino Sans GB","Segoe UI",system-ui,sans-serif;position:relative;font-family:var(--oqc-font);display:flex;flex-direction:column;gap:18px;padding:4px 2px 28px;max-width:640px}
@@ -518,6 +523,7 @@ ${FONT_FACES}
 .oqc-rangeDash{flex:none;font-size:11px;color:var(--dsw-alias-label-tertiary)}
 .oqc-rangePct{flex:none;font-size:10.5px;color:var(--dsw-alias-label-tertiary)}
 .oqc-follow{flex:none;display:flex;align-items:center;gap:6px;width:96px;font-size:11px;color:var(--dsw-alias-label-secondary);white-space:nowrap;cursor:pointer}
+.oqc-follow input[type=checkbox]{accent-color:#2ea043}
 .oqc-hint{margin:0;font-size:10.5px;font-weight:400;line-height:1.5;color:var(--dsw-alias-label-tertiary)}
 .oqc-keyList{display:flex;flex-direction:column;gap:6px}
 .oqc-keyRow{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;border:.5px solid var(--dsw-alias-border-l2);background:color-mix(in srgb,var(--dsw-alias-bg-layer-1) 52%,transparent)}
@@ -538,23 +544,29 @@ ${FONT_FACES}
 .oqc-acct[data-current=true]{border-color:color-mix(in srgb,var(--dsw-alias-brand-primary) 34%,transparent);background:color-mix(in srgb,var(--dsw-alias-brand-primary) 4%,transparent)}
 .oqc-acctHead{display:flex;align-items:center;gap:8px}
 .oqc-acctName{flex:1;min-width:0;font-size:12px;font-weight:500;color:var(--dsw-alias-label-primary)}
-.oqc-acct .oqc-keyRow{border:0;background:transparent;padding:2px 0}
-.oqc-acctTag{background:#2ea043;color:#fff;font-weight:600}
+.oqc-acct .oqc-keyRow{border:0;background:transparent;padding:2px 0 2px 20px}
+.oqc-acctTag,.oqc-acctTagBusy{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;flex:none;height:22px;padding:0 8px;border:.5px solid transparent;border-radius:6px;font-size:11px;font-weight:600;line-height:1;letter-spacing:0;white-space:nowrap;cursor:default;user-select:none}
+.oqc-acctTag{background:#2ea043;color:#fff}
 .oqc-acctSwitch{display:inline-flex;align-items:center;gap:3px;align-self:flex-start;padding:0;border:0;background:transparent;color:var(--dsw-alias-label-tertiary);font:inherit;font-size:10px;line-height:1.3;cursor:pointer}
-.oqc-acctSwitch:hover{color:var(--dsw-alias-label-secondary)}
+.oqc-acctSwitch:hover:not(:disabled){color:var(--dsw-alias-label-secondary)}
+.oqc-acctSwitch:disabled{opacity:.55;cursor:default}
 .oqc-caret{font-size:8px;opacity:.8}
 .oqc-acctMenu{position:absolute;z-index:9;top:26px;left:0;min-width:132px;padding:4px;border-radius:8px;border:1px solid var(--dsw-alias-border-l2);background:var(--dsw-alias-bg-layer-1);box-shadow:0 8px 22px rgba(0,0,0,.14);display:flex;flex-direction:column;gap:2px}
 .oqc-acctItem{display:flex;align-items:center;gap:6px;width:100%;padding:4px 7px;border:0;border-radius:6px;background:transparent;color:var(--dsw-alias-label-secondary);font:inherit;font-size:11px;text-align:left;cursor:pointer}
-.oqc-acctItem:hover{background:color-mix(in srgb,var(--dsw-alias-label-primary) 6%,transparent)}
+.oqc-acctItem:hover:not(:disabled){background:color-mix(in srgb,var(--dsw-alias-label-primary) 6%,transparent)}
+.oqc-acctItem:disabled{opacity:.5;cursor:default}
 .oqc-acctItem[data-depth='1']{padding-left:20px;font-size:10.5px}
 .oqc-acctItem[data-current=true]{color:var(--dsw-alias-brand-primary);font-weight:600}
 .oqc-acctTagBusy{background:color-mix(in srgb,var(--dsw-alias-label-primary) 10%,transparent);color:var(--dsw-alias-label-secondary);font-weight:500}
-.oqc-acctId{display:block;margin:-2px 0 2px;font-family:ui-monospace,"SF Mono",Consolas,monospace;font-size:9.5px;line-height:1.4;letter-spacing:.01em;color:var(--dsw-alias-label-tertiary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.oqc-tipBtn{flex:none;display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:14px;height:14px;min-width:14px;padding:0;border:1px solid var(--dsw-alias-border-l4);border-radius:50%;background:transparent;color:var(--dsw-alias-label-tertiary);font-family:inherit;font-size:9.5px;line-height:1;cursor:pointer}
-.oqc-tipBtn:hover{color:var(--dsw-alias-label-primary);border-color:var(--dsw-alias-label-tertiary)}
-.oqc-tipPop{position:absolute;z-index:9;top:22px;left:0;max-width:250px;padding:8px 10px;border:1px solid var(--dsw-alias-border-l2);border-radius:8px;background:var(--dsw-alias-bg-layer-1);box-shadow:0 8px 22px rgba(0,0,0,.14);font-size:11px;font-weight:400;line-height:1.55;color:var(--dsw-alias-label-secondary);white-space:normal}
+.oqc-acctMeta{display:flex;align-items:baseline;min-width:0;margin:-2px 0 2px;white-space:nowrap;overflow:hidden}
+.oqc-acctId{display:block;flex:0 1 auto;min-width:0;font-family:ui-monospace,"SF Mono",Consolas,monospace;font-size:9.5px;line-height:1.4;letter-spacing:.01em;color:var(--dsw-alias-label-tertiary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.oqc-acctCount{flex:none;font-family:inherit;font-size:9.5px;line-height:1.4;letter-spacing:0;color:var(--dsw-alias-label-tertiary);white-space:nowrap}
+.oqc-tipBtn{flex:0 0 14px;display:inline-flex;align-items:center;justify-content:center;align-self:center;box-sizing:border-box !important;width:14px !important;height:14px !important;min-width:14px !important;max-width:14px !important;min-height:14px !important;max-height:14px !important;aspect-ratio:1;padding:0 !important;border:1px solid var(--dsw-alias-border-l4);border-radius:50% !important;corner-shape:round !important;background:transparent;color:var(--dsw-alias-label-tertiary);font-family:inherit;font-size:9.5px;font-weight:500;line-height:1;cursor:help;appearance:none;-webkit-appearance:none;transform:translateY(0.5px);overflow:hidden;transition:background 140ms ease,color 140ms ease,border-color 140ms ease}
+.oqc-tipBtn:hover,.oqc-tipBtn:focus-visible{color:var(--dsw-alias-label-primary);border-color:var(--dsw-alias-label-tertiary);background:color-mix(in srgb,var(--dsw-alias-label-primary) 6%,transparent)}
+.oqc-tipBtn:focus-visible{outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--dsw-alias-brand-primary) 26%,transparent)}
+.oqc-tipPop{position:absolute;z-index:9;top:22px;left:0;max-width:250px;white-space:normal}
 .oqc-keyRow[data-editing=true]{border-color:color-mix(in srgb,var(--dsw-alias-brand-primary) 40%,transparent);background:color-mix(in srgb,var(--dsw-alias-brand-primary) 6%,transparent)}
-.oqc-keyBtn{flex:none;height:22px;padding:0 8px;border:.5px solid var(--dsw-alias-border-l4);border-radius:6px;background:transparent;color:var(--dsw-alias-label-secondary);font:inherit;font-size:11px;cursor:pointer;transition:background 140ms ease,color 140ms ease}
+.oqc-keyBtn{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;flex:none;height:22px;padding:0 8px;border:.5px solid var(--dsw-alias-border-l4);border-radius:6px;background:transparent;color:var(--dsw-alias-label-secondary);font:inherit;font-size:11px;line-height:1;white-space:nowrap;cursor:pointer;transition:background 140ms ease,color 140ms ease}
 .oqc-keyBtn:hover{background:color-mix(in srgb,var(--dsw-alias-label-primary) 6%,transparent);color:var(--dsw-alias-label-primary)}
 .oqc-panelHead .oqc-btn{height:24px;padding:0 9px;font-size:11px}
 .oqc-block[data-skeleton=true]{pointer-events:none}
@@ -1307,6 +1319,9 @@ ${FONT_FACES}
       const yMax = Math.max(120, Math.ceil(Math.max(projected, last.percent, 100) / 50) * 50)
       const X = (at) => Math.max(0, Math.min(100, ((at - periodStart) / (resetAt - periodStart)) * 100))
       const Y = (value) => Math.max(0, Math.min(100, 100 - (value / yMax) * 100))
+      /** 末端标签贴在点左侧、上边与点对齐；点太靠下时改为上方右对齐，避免压住日期轴。 */
+      const projectedY = Y(projected)
+      const endTopAligned = projectedY <= 68
       const line = points
         .map((point, index) => `${index === 0 ? 'M' : 'L'}${X(point.at).toFixed(2)},${Y(point.percent).toFixed(2)}`)
         .join(' ')
@@ -1467,11 +1482,25 @@ ${FONT_FACES}
                   style: { left: `${X(hit)}%`, top: `${Y(100)}%` },
                 })
               : null,
+            last.at < resetAt
+              ? h('span', {
+                  className: 'oqc-mark oqc-markNow',
+                  'data-low': Y(last.percent) < 24 ? 'true' : 'false',
+                  style: { left: `${X(last.at)}%`, top: `${Y(last.percent)}%` },
+                }, `${Math.round(last.percent)}%`)
+              : null,
             h(
               'span',
               {
-                className: `oqc-mark ${Y(projected) < 34 ? 'oqc-markSide' : 'oqc-markEnd'}`,
-                style: { left: '100%', top: `${Y(projected)}%` },
+                className: `oqc-mark ${endTopAligned ? 'oqc-markEndTop' : 'oqc-markEnd'}`,
+                style: {
+                  left: '100%',
+                  top: endTopAligned
+                    ? projectedY <= 3
+                      ? '0'
+                      : `calc(${projectedY}% - 3px)`
+                    : `${projectedY}%`,
+                },
               },
               `${Math.round(projected)}%`,
             ),
@@ -1623,23 +1652,20 @@ ${FONT_FACES}
       const [dropAt, setDropAt] = React.useState(null)
       const [tipOpen, setTipOpen] = React.useState(false)
       const [switchOpen, setSwitchOpen] = React.useState(false)
-      /** 点别处 / 按 Esc 就收起气泡，别让它一直挂在屏幕上。 */
+      /** 账户菜单点别处 / 按 Esc 收起；提示气泡跟随 hover / focus，不用全局监听。 */
       React.useEffect(() => {
-        if (!tipOpen && !switchOpen) return undefined
-        const closeAll = () => {
-          setTipOpen(false)
-          setSwitchOpen(false)
-        }
+        if (!switchOpen) return undefined
+        const close = () => setSwitchOpen(false)
         const onDown = (event) => {
           const target = event.target
           const inside =
             target && target.closest
-              ? target.closest('.oqc-tipBtn, .oqc-tipPop, .oqc-acctSwitch, .oqc-acctMenu')
+              ? target.closest('.oqc-acctSwitch, .oqc-acctMenu')
               : null
-          if (!inside) closeAll()
+          if (!inside) close()
         }
         const onKey = (event) => {
-          if (event.key === 'Escape') closeAll()
+          if (event.key === 'Escape') close()
         }
         document.addEventListener('mousedown', onDown, true)
         document.addEventListener('keydown', onKey, true)
@@ -1647,7 +1673,12 @@ ${FONT_FACES}
           document.removeEventListener('mousedown', onDown, true)
           document.removeEventListener('keydown', onKey, true)
         }
-      }, [tipOpen, switchOpen])
+      }, [switchOpen])
+      /** 刷新 / 切换期间锁住账户菜单，避免同一时间发出两次切换。 */
+      const accountLocked = busy || accountSwitching
+      React.useEffect(() => {
+        if (accountLocked) setSwitchOpen(false)
+      }, [accountLocked])
       /** 7 天图优先用按天的数据；没有时用小时数据在本地按日聚合。 */
       const trendRows = range === '24h' ? hourly : daily || hourly
       const chartColor = tiers[0] && !tiers[0].follow ? tiers[0].color : '#2ea043'
@@ -2042,7 +2073,7 @@ ${FONT_FACES}
           className: 'oqc-card',
           'data-variant': variant,
           'data-style': style,
-          'data-loading': loading || busy || accountSwitching ? 'true' : 'false',
+          'data-loading': loading ? 'true' : 'false',
           onDragOver,
           onDrop,
         },
@@ -2062,13 +2093,11 @@ ${FONT_FACES}
                     {
                       type: 'button',
                       className: 'oqc-tipBtn',
-                      title: tip,
                       'aria-label': tip,
-                      'aria-expanded': tipOpen ? 'true' : 'false',
-                      onClick: (event) => {
-                        event.stopPropagation()
-                        setTipOpen(!tipOpen)
-                      },
+                      onMouseEnter: () => setTipOpen(true),
+                      onMouseLeave: () => setTipOpen(false),
+                      onFocus: () => setTipOpen(true),
+                      onBlur: () => setTipOpen(false),
                     },
                     '?',
                   )
@@ -2085,7 +2114,6 @@ ${FONT_FACES}
                   {
                     type: 'button',
                     className: 'oqc-refresh',
-                    'data-busy': busy ? 'true' : 'false',
                     title: t('refreshTitle'),
                     'aria-label': t('refreshTitle'),
                     onClick: onRefresh,
@@ -2139,7 +2167,8 @@ ${FONT_FACES}
                     type: 'button',
                     className: 'oqc-acctSwitch',
                     'data-busy': accountSwitching ? 'true' : 'false',
-                    title: t('accountSwitch'),
+                    disabled: accountLocked,
+                    title: accountSwitching ? t('accountSwitching') : busy ? t('refreshing') : t('accountSwitch'),
                     onClick: () => setSwitchOpen(!switchOpen),
                   },
                   accountSwitching ? h(Spinner) : null,
@@ -2166,7 +2195,9 @@ ${FONT_FACES}
                       className: 'oqc-acctItem',
                       'data-current': row.current ? 'true' : 'false',
                       'data-depth': row.depth ? String(row.depth) : '0',
+                      disabled: accountLocked,
                       onClick: () => {
+                        if (accountLocked) return
                         setSwitchOpen(false)
                         if (!row.current && onSwitchAccount) onSwitchAccount(row.id, row.sa, row.scope)
                       },
@@ -2177,7 +2208,7 @@ ${FONT_FACES}
               )
             : null,
           sub ? h('div', { className: 'oqc-sub' }, sub) : null,
-          tip && tipOpen ? h('div', { className: 'oqc-tipPop' }, tip) : null,
+          tip && tipOpen ? h('div', { className: 'oqc-pop oqc-tipPop', role: 'tooltip' }, tip) : null,
         ),
         body ? h('div', { className: 'oqc-body' }, body) : null,
         slots,
@@ -2469,7 +2500,7 @@ ${FONT_FACES}
       /** 首次拉取：只留页头和加载态，别让半截表单先闪一下。 */
       const loading = snapshot.phase === 'loading' && accounts.length === 0
       /** 刷新和切换都算忙碌：页头转圈 + 内容变淡。 */
-      const busy = pending || Boolean(switching)
+      const busy = pending || Boolean(switching) || Boolean(snapshot.busy)
 
       return h(
         'div',
@@ -2549,9 +2580,12 @@ ${FONT_FACES}
                             ),
                     ),
                     h(
-                      'code',
-                      { className: 'oqc-acctId', title: row.id },
-                      shortId(row.id) + (row.members && row.members.length > 1 ? ` · ${row.members.length} 个服务账号` : ''),
+                      'div',
+                      { className: 'oqc-acctMeta' },
+                      h('code', { className: 'oqc-acctId', title: row.id }, shortId(row.id)),
+                      row.members && row.members.length > 1
+                        ? h('span', { className: 'oqc-acctCount' }, ` · ${t('accountMembers', { n: row.members.length })}`)
+                        : null,
                     ),
                     h('div', { className: 'oqc-keyList' }, saRows(row)),
                   )
