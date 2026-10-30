@@ -214,14 +214,19 @@ body{font-family:"Segoe UI","Microsoft YaHei UI","Microsoft YaHei",system-ui,san
 .oqc-gauge{display:block;width:150px;height:84px;margin:0 auto 10px;align-self:center;font-family:inherit;color:var(--dsw-alias-label-primary)}
 .oqc-gaugeArc{display:block;width:150px;height:84px;overflow:visible}
 .oqc-gauge text{font-family:inherit;font-variant-numeric:tabular-nums}
-.oqc-table{display:flex;flex-direction:column;gap:8px}
-.oqc-card[data-variant=full] .oqc-table{gap:10px}
-.oqc-tr{display:flex;align-items:baseline;gap:8px;min-width:0}
-.oqc-trHead{font-size:9px;letter-spacing:.04em;color:var(--dsw-alias-label-tertiary)}
-.oqc-tlabel{flex:none;width:26px;font-size:10px;line-height:1.4;color:var(--dsw-alias-label-secondary)}
-.oqc-trHead .oqc-tlabel{width:26px}
-.oqc-td{flex:1 1 0;min-width:0;font-size:11px;line-height:1.35;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--dsw-alias-label-primary)}
+.oqc-table{display:flex;flex-direction:column;gap:0}
+.oqc-tr{position:relative;display:grid;grid-template-columns:36px repeat(3,minmax(0,1fr));column-gap:14px;align-items:baseline;min-width:0;padding:6px 0}
+.oqc-tr:first-child{padding-top:0}
+.oqc-tr:last-child{padding-bottom:0}
+.oqc-tr+.oqc-tr::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;pointer-events:none;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--dsw-alias-label-primary) 12%,transparent) 10%,color-mix(in srgb,var(--dsw-alias-label-primary) 12%,transparent) 90%,transparent)}
+.oqc-trHead{padding:0 0 6px;font-size:9px;letter-spacing:.06em;color:var(--dsw-alias-label-tertiary)}
+.oqc-trHead+.oqc-tr::before{background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--dsw-alias-label-primary) 20%,transparent) 6%,color-mix(in srgb,var(--dsw-alias-label-primary) 20%,transparent) 94%,transparent)}
+.oqc-tlabel{min-width:0;font-size:10px;font-weight:500;line-height:1.4;color:var(--dsw-alias-label-secondary);white-space:nowrap}
+.oqc-td{min-width:0;font-size:11px;line-height:1.35;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--dsw-alias-label-primary)}
 .oqc-trHead .oqc-td{font-size:9px;font-weight:400;color:var(--dsw-alias-label-tertiary)}
+.oqc-card[data-variant=full] .oqc-tr{grid-template-columns:42px repeat(3,minmax(0,1fr));column-gap:18px;padding:8px 0}
+.oqc-card[data-variant=full] .oqc-trHead{padding:0 0 8px}
+.oqc-card[data-variant=full] .oqc-tlabel{font-size:11px}
 .oqc-card[data-variant=full] .oqc-td{font-size:12px}
 .oqc-compare{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:10px;line-height:1.4;color:var(--dsw-alias-label-tertiary)}
 .oqc-card[data-variant=full] .oqc-compare{font-size:11px}
