@@ -434,6 +434,10 @@ ${FONT_FACES}
 .oqc-tlabel{min-width:0;font-size:10px;font-weight:500;line-height:1.4;color:var(--dsw-alias-label-secondary);white-space:nowrap}
 .oqc-td{min-width:0;font-size:11px;line-height:1.35;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--dsw-alias-label-primary)}
 .oqc-trHead .oqc-td{font-size:9px;font-weight:400;color:var(--dsw-alias-label-tertiary)}
+.oqc-tokenCell{position:relative;overflow:visible;cursor:help}
+.oqc-tokenCell:focus-visible{outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--dsw-alias-brand-primary) 26%,transparent)}
+.oqc-tokenText{display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.oqc-tokenTip{right:0;left:auto;top:auto;bottom:calc(100% + 6px);transform:none;max-width:none;font-variant-numeric:tabular-nums}
 .oqc-card[data-variant=full] .oqc-tr{grid-template-columns:42px repeat(3,minmax(0,1fr));column-gap:18px;padding:8px 0}
 .oqc-card[data-variant=full] .oqc-trHead{padding:0 0 8px}
 .oqc-card[data-variant=full] .oqc-tlabel{font-size:11px}
@@ -1288,6 +1292,29 @@ ${FONT_FACES}
       return number >= 1e6 ? compactNumber(number) : Math.round(number).toLocaleString('en-US')
     }
 
+    /**
+     * Tokens 单元格：平时显示紧凑值，hover / focus 时给出精确到个位的数字。
+     * @param {{ value: number }} props 组件参数。
+     * @returns {any} React 元素。
+     */
+    function TokenCell({ value }) {
+      const [open, setOpen] = React.useState(false)
+      const exact = Math.round(Number(value) || 0).toLocaleString('en-US')
+      return h(
+        'span',
+        {
+          className: 'oqc-td oqc-tokenCell',
+          tabIndex: 0,
+          'aria-label': exact,
+          onMouseEnter: () => setOpen(true),
+          onMouseLeave: () => setOpen(false),
+          onFocus: () => setOpen(true),
+          onBlur: () => setOpen(false),
+        },
+        h('span', { className: 'oqc-tokenText' }, unitNode(compactNumber(value))),
+        open ? h('span', { className: 'oqc-tip oqc-tokenTip', role: 'tooltip' }, exact) : null,
+      )
+    }
 
     /**
      * 重置说明：`Resets in` + 等宽时长 + `后重置`，三段不同字重。
@@ -2051,7 +2078,7 @@ ${FONT_FACES}
           h('span', { className: 'oqc-tlabel' }, label),
           h('span', { className: 'oqc-td' }, totals && totals.cost !== null ? moneyNode(totals.cost) : '—'),
           h('span', { className: 'oqc-td' }, totals ? unitNode(countText(totals.requests)) : '—'),
-          h('span', { className: 'oqc-td' }, totals ? unitNode(compactNumber(totals.tokens)) : '—'),
+          totals ? h(TokenCell, { value: totals.tokens }) : h('span', { className: 'oqc-td' }, '—'),
         )
       const periodRows = [
         todayTotals ? periodRow('today', t('blockToday'), todayTotals) : null,
