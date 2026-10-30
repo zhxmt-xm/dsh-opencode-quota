@@ -2,8 +2,9 @@
 /**
  * 在 desktop profile 的本地 link 安装与 GitHub 安装之间切换。
  *
- *   npm run switch:link
- *   npm run switch:github
+ *   npm start              # 交互选择
+ *   node switch-source.mjs link
+ *   node switch-source.mjs github
  *
  * 为什么要这个脚本：DSH 当前插件管理器卸载 `link:` 依赖时不会删除
  * `node_modules` 里的 junction；直接 add 另一种来源会 EPERM。这里先清掉
@@ -18,14 +19,15 @@
 import { lstatSync, readdirSync, rmSync, rmdirSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { dirname, join } from 'node:path'
+import { createInterface } from 'node:readline/promises'
 import { fileURLToPath } from 'node:url'
 import { spawnSync } from 'node:child_process'
 
 const repoRoot = dirname(fileURLToPath(import.meta.url))
-const source = process.argv[2]
+let source = process.argv[2]
 
-if (source !== 'link' && source !== 'github') {
-  console.error('用法：node switch-source.mjs <link|github>')
+if (source !== undefined && source !== 'link' && source !== 'github') {
+  console.error('用法：npm start，或 node switch-source.mjs <link|github>')
   process.exit(2)
 }
 
@@ -40,6 +42,36 @@ if (!lstatSync(profileDir, { throwIfNoEntry: false })) {
   console.error(`找不到 profile：${profileDir}`)
   process.exit(1)
 }
+
+/** 当前 node_modules 里装的是 link 还是 GitHub 版。 */
+function currentState() {
+  const info = lstatSync(pkgDir, { throwIfNoEntry: false })
+  if (!info) return '未安装'
+  return info.isSymbolicLink() ? '本地 link' : 'GitHub 版'
+}
+
+/** 没有命令行参数时，用 1/2 选择目标来源。 */
+async function chooseSource() {
+  const rl = createInterface({ input: process.stdin, output: process.stdout })
+  console.log(`当前安装：${currentState()}`)
+  console.log('切换前请先完全退出 DSH。')
+  console.log('')
+  console.log(`  1) 本地 link   ${repoRoot}`)
+  console.log('  2) GitHub      github:zhxmt-xm/dsh-opencode-quota')
+  console.log('')
+  let answer
+  try {
+    answer = (await rl.question('选择 1/2（Ctrl+C 退出）：')).trim()
+  } finally {
+    rl.close()
+  }
+  if (answer === '1') return 'link'
+  if (answer === '2') return 'github'
+  console.error('无效选择')
+  process.exit(2)
+}
+
+if (!source) source = await chooseSource()
 
 if (process.platform === 'win32') {
   const check = spawnSync('tasklist', ['/FI', 'IMAGENAME eq DeepSeek Harness.exe', '/NH'], {
