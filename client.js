@@ -469,8 +469,12 @@ ${FONT_FACES}
 .oqc-logo{flex:none;display:block;border-radius:4px}
 .oqc-desc{margin:0;font-size:12.5px;font-weight:400;line-height:1.6;color:var(--dsw-alias-label-secondary)}
 .oqc-panel{display:flex;flex-direction:column;gap:10px;padding:14px 16px;border:.5px solid var(--dsw-alias-border-l2);border-radius:10px;background:color-mix(in srgb,var(--dsw-alias-bg-layer-3) 40%,transparent)}
+.oqc-preview{display:flex;justify-content:center;padding:2px 0 4px}
+.oqc-preview > .oqc-card{width:100%;max-width:340px;margin:0}
 .oqc-panelHead{display:flex;align-items:center;gap:8px}
 .oqc-panelTitle{flex:1;min-width:0;font-size:12.5px;font-weight:500;color:var(--dsw-alias-label-primary)}
+.oqc-panelTitleAuto{flex:0 1 auto}
+.oqc-manageHead{position:relative;gap:3px}
 .oqc-intervalRow{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
 .oqc-intervalRow .oqc-settingValue{flex:0 1 auto;justify-content:flex-end}
 .oqc-segCompact .oqc-segBtn{height:24px;padding:0 8px;font-size:11px}
@@ -1190,14 +1194,33 @@ ${FONT_FACES}
      * @returns {any} React 元素。
      */
     function Logo({ size = 16 }) {
+      const width = size
+      /** 高度算到柔光底部为止：33 / 40。 */
+      const height = Math.round((size * 33 / 40) * 100) / 100
       return h(
         'svg',
-        { className: 'oqc-logo', viewBox: '0 0 64 64', width: size, height: size, role: 'img', 'aria-label': 'OpenCode' },
-        h('rect', { width: 64, height: 64, rx: 14, fill: '#0f172a' }),
-        h('path', { d: 'M16 40a16 16 0 0 1 32 0', fill: 'none', stroke: '#334155', 'stroke-width': 6, 'stroke-linecap': 'round' }),
-        h('path', { d: 'M16 40a16 16 0 0 1 22.6-14.8', fill: 'none', stroke: '#4f9cf9', 'stroke-width': 6, 'stroke-linecap': 'round' }),
-        h('circle', { cx: 32, cy: 40, r: 3.2, fill: '#e2e8f0' }),
-        h('path', { d: 'M32 40 41 29', stroke: '#e2e8f0', 'stroke-width': 2.6, 'stroke-linecap': 'round' }),
+        { className: 'oqc-logo', viewBox: '12 17 40 33', width, height, role: 'img', 'aria-label': 'OpenCode' },
+        h(
+          'defs',
+          null,
+          h(
+            'linearGradient',
+            { id: 'oqc-logo-arc', x1: 0, y1: 0, x2: 1, y2: 1 },
+            h('stop', { offset: 0, 'stop-color': '#c4b5fd' }),
+            h('stop', { offset: 1, 'stop-color': '#3b82f6' }),
+          ),
+          h(
+            'radialGradient',
+            { id: 'oqc-logo-glow', cx: '50%', cy: '50%', r: '50%' },
+            h('stop', { offset: 0, 'stop-color': '#8b5cf6', 'stop-opacity': 0.28 }),
+            h('stop', { offset: 1, 'stop-color': '#8b5cf6', 'stop-opacity': 0 }),
+          ),
+        ),
+        h('path', { d: 'M16 40a16 16 0 0 1 32 0', fill: 'none', stroke: '#ede9fe', 'stroke-width': 6, 'stroke-linecap': 'round' }),
+        h('circle', { cx: 32, cy: 40, r: 10, fill: 'url(#oqc-logo-glow)' }),
+        h('path', { d: 'M16 40a16 16 0 0 1 22.6-14.8', fill: 'none', stroke: 'url(#oqc-logo-arc)', 'stroke-width': 6, 'stroke-linecap': 'round' }),
+        h('circle', { cx: 32, cy: 40, r: 3.2, fill: '#312e81' }),
+        h('path', { d: 'M32 40 41 29', fill: 'none', stroke: '#312e81', 'stroke-width': 2.8, 'stroke-linecap': 'round' }),
       )
     }
 
@@ -1862,6 +1885,7 @@ ${FONT_FACES}
       hidden = [],
       manage = false,
       onToggle,
+      headless = false,
     }) {
       const full = variant === 'full'
       const range = trendRange === '24h' ? '24h' : '7d'
@@ -2295,7 +2319,9 @@ ${FONT_FACES}
           onDragOver,
           onDrop,
         },
-        h(
+        headless
+          ? null
+          : h(
           'div',
           { className: 'oqc-head' },
           h(
@@ -2304,7 +2330,7 @@ ${FONT_FACES}
             h(
               'span',
               { className: 'oqc-titleGroup', 'data-tip': tip ? 'true' : 'false' },
-              h(Logo, { size: full ? 18 : 15 }),
+              h(Logo, { size: full ? 20 : 17 }),
               h('span', { className: 'oqc-titleText' }, title || t('limitsTitle')),
               tip
                 ? h(
@@ -2596,6 +2622,7 @@ ${FONT_FACES}
       const [switching, setSwitching] = React.useState(null)
       /** 色卡弹窗：改动先留在草稿里，点「应用」才写回偏好。 */
       const [colorEdit, setColorEdit] = React.useState(null)
+      const [manageTipOpen, setManageTipOpen] = React.useState(false)
       React.useEffect(() => {
         if (!colorEdit) return undefined
         const onDown = (event) => {
@@ -2742,7 +2769,7 @@ ${FONT_FACES}
       return h(
         'div',
         { className: 'oqc-page' },
-        h('h2', { className: 'oqc-pageTitle' }, h(Logo, { size: 20 }), t('pageTitle')),
+        h('h2', { className: 'oqc-pageTitle' }, h(Logo, { size: 22 }), t('pageTitle')),
         h('p', { className: 'oqc-desc' }, t('pageIntro')),
 
         loading
@@ -3003,38 +3030,63 @@ ${FONT_FACES}
 
         /** 分块管理不该跟着订阅走：没有额度的账户也要能排序、隐藏。 */
         view.kind || view.configured
-          ? h(LimitsCard, {
-              variant: 'full',
-              style: settings.style,
-              railColor: settings.railColor,
-              order: settings.order,
-              hidden: settings.hidden || [],
-              manage: true,
-              onReorder: (next) => prefs.set({ order: next }),
-              onToggle: (id) => {
-                const current = settings.hidden || []
-                prefs.set({ hidden: current.includes(id) ? current.filter((row) => row !== id) : current.concat(id) })
-              },
-              title: t('manageTitle'),
-              tip: t('manageTip'),
-              quota: view.quota,
-              summary: view.summary,
-              daily: view.daily,
-              hourly: view.hourly,
-              compare: view.compare,
-              period: view.period,
-              models: view.models,
-              tiers,
-              at: snapshot.fetchedAt,
-              intervalSec: settings.intervalSec,
-              trendRange: settings.trendRange,
-              trendMetric: settings.trendMetric,
-              onTrendRange: (value) => prefs.set({ trendRange: value }),
-              onTrendMetric: (value) => prefs.set({ trendMetric: value }),
-              t,
-              onRefresh: () => api.refresh({ fresh: true }),
-              busy: snapshot.busy,
-            })
+          ? h(
+              'div',
+              { className: 'oqc-panel oqc-previewPanel' },
+              h(
+                'div',
+                { className: 'oqc-panelHead oqc-manageHead' },
+                h('span', { className: 'oqc-panelTitle oqc-panelTitleAuto' }, t('manageTitle')),
+                h(
+                  'button',
+                  {
+                    type: 'button',
+                    className: 'oqc-tipBtn',
+                    'aria-label': t('manageTip'),
+                    onMouseEnter: () => setManageTipOpen(true),
+                    onMouseLeave: () => setManageTipOpen(false),
+                    onFocus: () => setManageTipOpen(true),
+                    onBlur: () => setManageTipOpen(false),
+                  },
+                  '?',
+                ),
+                manageTipOpen
+                  ? h('div', { className: 'oqc-pop oqc-tipPop', role: 'tooltip' }, t('manageTip'))
+                  : null,
+              ),
+              h(
+                'div',
+                { className: 'oqc-preview' },
+                h(LimitsCard, {
+                  variant: 'sidebar',
+                  headless: true,
+                  style: settings.style,
+                  railColor: settings.railColor,
+                  order: settings.order,
+                  hidden: settings.hidden || [],
+                  manage: true,
+                  onReorder: (next) => prefs.set({ order: next }),
+                  onToggle: (id) => {
+                    const current = settings.hidden || []
+                    prefs.set({ hidden: current.includes(id) ? current.filter((row) => row !== id) : current.concat(id) })
+                  },
+                  quota: view.quota,
+                  summary: view.summary,
+                  daily: view.daily,
+                  hourly: view.hourly,
+                  compare: view.compare,
+                  period: view.period,
+                  models: view.models,
+                  tiers,
+                  trendRange: settings.trendRange,
+                  trendMetric: settings.trendMetric,
+                  onTrendRange: (value) => prefs.set({ trendRange: value }),
+                  onTrendMetric: (value) => prefs.set({ trendMetric: value }),
+                  t,
+                  busy: snapshot.busy,
+                }),
+              ),
+            )
           : null,
 
         h(
@@ -3106,6 +3158,104 @@ ${FONT_FACES}
       window.setTimeout(attempt, 0)
     }
 
+    /**
+     * 设置导航里的插件 logo。
+     *
+     * DSH 的 `settings.section` 只投影 id / order / label，第三方分区没有
+     * icon 字段，导航里一律回落到齿轮。这里按当前语言的分区名认领本插件的
+     * 那一行，隐藏齿轮，换成插件 logo。
+     */
+    const NAV_ICON_MARKER = 'data-oqc-nav-icon'
+    const NAV_ROW_SELECTOR = '[role="dialog"] nav button'
+    const NAV_LOGO_SVG =
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="12 17 40 33">'
+      + '<defs>'
+      + '<linearGradient id="oqc-nav-arc" x1="0" y1="0" x2="1" y2="1">'
+      + '<stop offset="0" stop-color="#c4b5fd"/><stop offset="1" stop-color="#3b82f6"/>'
+      + '</linearGradient>'
+      + '<radialGradient id="oqc-nav-glow" cx="50%" cy="50%" r="50%">'
+      + '<stop offset="0" stop-color="#8b5cf6" stop-opacity=".28"/>'
+      + '<stop offset="1" stop-color="#8b5cf6" stop-opacity="0"/>'
+      + '</radialGradient>'
+      + '</defs>'
+      + '<path d="M16 40a16 16 0 0 1 32 0" fill="none" stroke="#ede9fe" stroke-width="6" stroke-linecap="round"/>'
+      + '<circle cx="32" cy="40" r="10" fill="url(#oqc-nav-glow)"/>'
+      + '<path d="M16 40a16 16 0 0 1 22.6-14.8" fill="none" stroke="url(#oqc-nav-arc)" stroke-width="6" stroke-linecap="round"/>'
+      + '<circle cx="32" cy="40" r="3.2" fill="#312e81"/>'
+      + '<path d="M32 40 41 29" fill="none" stroke="#312e81" stroke-width="2.8" stroke-linecap="round"/>'
+      + '</svg>'
+
+    /**
+     * 给导航行用的 logo 样式。
+     * @returns {string} CSS 文本。
+     */
+    function navIconCss() {
+      const url = `data:image/svg+xml,${encodeURIComponent(NAV_LOGO_SVG)}`
+      const width = 20
+      /** 和 Logo 组件一致：20 : 16.5 = 40 : 33，底部到柔光边缘。 */
+      const height = 16.5
+      return [
+        `[${NAV_ICON_MARKER}] > svg { display: none; }`,
+        `[${NAV_ICON_MARKER}]::before {`,
+        `  content: '';`,
+        `  flex: none;`,
+        `  width: ${width}px;`,
+        `  height: ${height}px;`,
+        `  background-image: url("${url}");`,
+        `  background-repeat: no-repeat;`,
+        `  background-position: center;`,
+        `  background-size: ${width}px ${height}px;`,
+        `}`,
+      ].join('\n')
+    }
+
+    /**
+     * 安装导航 logo；设置弹窗打开、语言切换后都会重新认领。
+     * @param {any} ctx 客户端上下文。
+     * @param {() => string} resolveLabel 当前分区的导航文案。
+     * @returns {void}
+     */
+    function installSettingsNavIcon(ctx, resolveLabel) {
+      if (typeof document === 'undefined') return
+      ctx.effect(() => {
+        const tag = document.createElement('style')
+        tag.dataset.plugin = NS
+        tag.dataset.pluginCss = `${NS}/settings-nav-icon`
+        tag.textContent = navIconCss()
+        document.head.appendChild(tag)
+
+        let disposed = false
+        let scheduled = false
+        const sync = () => {
+          scheduled = false
+          if (disposed) return
+          const wanted = String(resolveLabel() || '').trim()
+          for (const row of document.querySelectorAll(NAV_ROW_SELECTOR)) {
+            const own = wanted.length > 0 && String(row.textContent || '').trim() === wanted
+            if (own) row.setAttribute(NAV_ICON_MARKER, '')
+            else row.removeAttribute(NAV_ICON_MARKER)
+          }
+        }
+        /** 一帧里多次 DOM 变更只同步一次。 */
+        const schedule = () => {
+          if (scheduled || disposed) return
+          scheduled = true
+          queueMicrotask(sync)
+        }
+        sync()
+        const observer = new MutationObserver(schedule)
+        observer.observe(document.body, { childList: true, subtree: true, characterData: true })
+        return () => {
+          disposed = true
+          observer.disconnect()
+          for (const row of document.querySelectorAll(`[${NAV_ICON_MARKER}]`)) {
+            row.removeAttribute(NAV_ICON_MARKER)
+          }
+          tag.remove()
+        }
+      }, 'opencode-quota: settings nav icon')
+    }
+
     return {
       inject: ['slots', 'locale'],
       apply(ctx) {
@@ -3115,6 +3265,8 @@ ${FONT_FACES}
         const store = createStore()
         const prefs = createPrefsStore()
         const api = createApi(store, prefs)
+
+        installSettingsNavIcon(ctx, () => t('nav'))
 
         ctx.effect(() => {
           const tag = document.createElement('style')
