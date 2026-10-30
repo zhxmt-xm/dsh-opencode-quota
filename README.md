@@ -46,27 +46,99 @@ OpenCode Go 的额度分散在几个接口里：滚动窗口、周窗口、月�
 
 ## 界面
 
+下面按侧栏卡片的五个分块、设置页的三个面板分别说明。截图使用固定样例数据（`acme` / `org_acme` 等账户名与组织 id 均为虚构），实际数字随账户变化。
+
 ### 侧栏卡片
 
-- 三个额度窗口：滚动 5 小时 / 本周 / 本月，含重置倒计时与进度条；
-- 今日花费、请求数、tokens，以及本周 / 本月汇总；
-- 最近 7 天或 24 小时的花费 / tokens / 请求数趋势；
-- 当前计费周期的额度预测：按当前速度是否会在重置前用完；
-- 模型花费条形图；
-- 账户切换菜单：组织一行，组织下的服务账号各一行。
+卡片放在侧栏设置按钮上方；侧栏收起时退化为一个百分比/金额小方块，展开后按偏好顺序显示五个分块。卡片顶部是账户入口：点账户名可切换组织和服务账号，右侧是刷新与设置按钮。
 
-### 设置 → OpenCode 套餐
+#### 用量
 
-- **账户**：列出 DSH 里的账户和各自 provider 凭据（只读，Key 在 DSH 的 provider 设置里改）；当前账户打绿色「当前」tag，其余可「切换」；右上「刷新数据」立即重读；下方可选刷新间隔（30 秒 / 1 分钟 / 5 分钟 / 15 分钟）；
-- **卡片展示**：预览五个分块，勾选控制是否显示在侧栏，拖拽标题调整顺序，`?` 里有说明；
-- **趋势图**：7 天 / 24 小时切换，花费 / tokens / 请求数切换；
-- **显示**：色条开关与颜色、四档进度条（名称 / 区间 / 颜色）。
+<p align="center">
+  <img src="docs/shots/card-today.png" alt="用量分块：本月剩余油表，以及今日、本周、本月的花费与请求数" width="300">
+</p>
 
-<details>
-<summary><b>查看三种账户形态与每个分块的空态参考图</b></summary>
-<br>
-<img src="docs/scenarios.png" alt="三种账户形态与每个分块的空态参考图">
-</details>
+- 今日花费、请求数、tokens；
+- 有月度额度时，顶部油表显示本月剩余百分比；
+- 下方并排汇总今日、本周、本月，不用来回切页面。
+
+#### 额度
+
+<p align="center">
+  <img src="docs/shots/card-quota.png" alt="额度分块：滚动、每周、每月三个窗口与重置倒计时" width="300">
+</p>
+
+- 滚动 5 小时、本周、本月三个窗口；
+- 进度条按四档分级变色，右侧显示已用百分比；
+- 每行带重置倒计时；没有 Go 订阅时整块隐藏。
+
+#### 预测
+
+<p align="center">
+  <img src="docs/shots/card-forecast.png" alt="预测分块：实测花费曲线、预测虚线与 50%/100% 预计日期" width="300">
+</p>
+
+- 按当前计费周期的花费速度做线性外推；
+- 绿色为实测、橙色为预测，标出 50% / 100% 的预计日期；
+- 没有月度额度或有效数据不足两个点时整块隐藏。
+
+#### 趋势
+
+<p align="center">
+  <img src="docs/shots/card-trend.png" alt="趋势分块：7 天或 24 小时的花费、tokens、请求数柱状图" width="300">
+</p>
+
+- 7 天 / 24 小时切换；
+- 花费 / tokens / 请求数切换；
+- 没有数据时保留分块，显示空态文案。
+
+#### 模型
+
+<p align="center">
+  <img src="docs/shots/card-models.png" alt="模型分块：按花费排序的模型条形图" width="300">
+</p>
+
+- 按花费排序，条形长度按最高花费归一化；
+- 最多显示四行；
+- 没有按模型计费记录时整块隐藏。
+
+### 设置页
+
+设置 → OpenCode 套餐。Key 仍在 DSH 的 provider 设置里管理，这一页只读。
+
+#### 账户
+
+<p align="center">
+  <img src="docs/shots/settings-account.png" alt="设置页账户面板：按组织分组的账户、服务账号、刷新间隔" width="640">
+</p>
+
+- 账户按组织分组，同一组织的 Key 合成一张卡；
+- 当前账户打绿色「当前」，其余可「切换」；组织下的服务账号可以单独筛选花费；
+- 「刷新数据」立即重读，刷新间隔可选 30 秒 / 1 分钟 / 5 分钟 / 15 分钟；
+- Key 只读，改 Key 去 DSH 设置 → Providers（`llm-pi-ai`）。
+
+#### 显示
+
+<p align="center">
+  <img src="docs/shots/settings-display.png" alt="设置页显示面板：卡片色条开关、色条颜色与四档进度条" width="640">
+</p>
+
+- 卡片样式：开关控制是否显示左侧色条，旁边选色条颜色；
+- 进度条分级：四档的名称、区间、颜色都可以改，区间首尾相接；
+- 「恢复默认」回到 0–50 绿、50–75 黄、75–90 橙、90–100 红。
+
+#### 卡片展示
+
+<p align="center">
+  <img src="docs/shots/settings-preview.png" alt="设置页卡片展示面板：五个分块的预览、勾选显示与拖拽排序" width="640">
+</p>
+
+- 直接预览五个分块，勾选框控制侧栏显示 / 隐藏；
+- 拖拽分块标题调整顺序；
+- 趋势的 7 天 / 24 小时、花费 / tokens / 请求数切换也在这里；
+- 右上角 `?` 有操作提示。
+
+> 这里没有单独的「趋势图」设置面板：趋势的显示范围与指标就在卡片展示的预览里切换。
 
 ## 账户形态
 
@@ -160,7 +232,8 @@ dsh plugin --profile desktop remove @local/dsh-opencode-quota
 - 原生 ESM + React（由 DSH 提供），无构建步骤、无运行时依赖；
 - Host：`index.js`；Client：`client.js`；bundle patch：`cordis.patch.yml`；
 - 冒烟测试：`node .smoke.mjs`（当前 32 项全部通过）；
-- 参考图生成：`node docs/render-scenarios.cjs`。
+- 参考图生成：`node docs/render-scenarios.cjs`；
+- 单块截图：`powershell -ExecutionPolicy Bypass -File docs/capture-shots.ps1`。
 
 架构、接口、缓存、偏好 schema、调试方式与发布检查见 [docs/README.md](docs/README.md)。
 

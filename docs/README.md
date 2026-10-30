@@ -63,10 +63,13 @@ flowchart LR
 | `icon.svg` | 插件 logo |
 | `LICENSE` | 插件代码的 MIT 许可 |
 | `.smoke.mjs` | 无框架冒烟测试：模拟 DSH 上下文与上游，验证路由、合并、降级、安全 |
-| `docs/render-scenarios.cjs` | 用迷你 React 替身渲染 `client.js`，生成参考图底稿 |
-| `docs/scenarios.html` | 生成的静态底稿，交给浏览器截图 |
-| `docs/scenarios.png` | 账户形态 × 分块空态参考图 |
-| `docs/screenshot-card.png` | 根 README 用的侧栏卡片截图（从参考图裁出） |
+| `docs/render-scenarios.cjs` | 用迷你 React 替身渲染 `client.js`，生成参考图与单块截图底稿 |
+| `docs/scenarios.html` | 生成的账户形态 × 分块空态静态底稿 |
+| `docs/scenarios.png` | 账户形态 × 分块空态参考图（维护者用，根 README 不再整张嵌入） |
+| `docs/settings.html` | 生成的设置页静态底稿，含账户 / 显示 / 卡片展示三个面板 |
+| `docs/shots/*.png` | 根 README 用的单块 / 单面板截图 |
+| `docs/capture-shots.ps1` | 调用 Edge 批量截取 `docs/shots/*.png` 的 Windows 脚本 |
+| `docs/screenshot-card.png` | 根 README 用的侧栏卡片整体截图 |
 
 插件管理里的标题/描述在 `locale/*.json`；设置分区 label 与卡片/设置页正文词典在 `client.js` 的 `zh` / `en` 对象里，改文案时两处都要看。
 
@@ -291,18 +294,42 @@ node .smoke.mjs
 
 ## 参考图
 
-`scenarios.png` — 三种账户形态 × 每个分块的空态（浅色主题，1344 × 3092）。
+根 README 不再嵌整张场景图，而是按界面拆成单块 / 单面板截图，放在 `docs/shots/`：
 
-- **A 段**：每种形态都保留全部五个分块。产品里会整块隐藏的分块画成虚线禁用块，位置不动，所以三列能按同一顺序横向对比。
-- **B 段**：每个分块的不同空态各占一格，下面是该状态的说明。
+| 文件 | 内容 |
+| --- | --- |
+| `shots/card-today.png` | 用量分块 |
+| `shots/card-quota.png` | 额度分块 |
+| `shots/card-forecast.png` | 预测分块 |
+| `shots/card-trend.png` | 趋势分块 |
+| `shots/card-models.png` | 模型分块 |
+| `shots/settings-account.png` | 设置页账户面板 |
+| `shots/settings-display.png` | 设置页显示面板 |
+| `shots/settings-preview.png` | 设置页卡片展示面板 |
 
-图不是手绘的：`render-scenarios.cjs` 用一套极小的 React 替身直接在 Node 里跑 `client.js` 的组件，把元素树序列化成静态 HTML，再交给浏览器排版。
+维护者用的完整参考图：
+
+- `scenarios.png` — 三种账户形态 × 每个分块的空态（浅色主题，约 1345 × 3094）。**A 段**每种形态都保留全部五个分块，产品里会整块隐藏的分块画成虚线禁用块，位置不动；**B 段**每个分块的不同空态各占一格。
+- `settings.html` — 设置页完整底稿，账户 / 显示 / 卡片展示三个面板一次看全。
+- `screenshot-card.png` — 侧栏卡片整体截图，根 README 顶部使用。
+
+图不是手绘的：`render-scenarios.cjs` 用一套极小的 React 替身直接在 Node 里跑 `client.js` 的组件，把元素树序列化成静态 HTML，再交给浏览器排版。单块截图只保留一个分块，单面板截图从设置页 DOM 里按 `.oqc-panel` 拆出，仍然是同一套组件和同一份样例数据。
 
 ### 重新生成
 
 ```bash
-node docs/render-scenarios.cjs        # → docs/scenarios.html
+node docs/render-scenarios.cjs
 ```
+
+写出 `docs/scenarios.html`、`docs/settings.html` 和 `docs/shots/*.html`。后者是截图中间产物，已被 `.gitignore` 忽略。
+
+```powershell
+powershell -ExecutionPolicy Bypass -File docs/capture-shots.ps1
+```
+
+脚本会再跑一次 `render-scenarios.cjs`，用 Edge 无头模式截取 `docs/shots/*.html`，并顺带重截 `docs/screenshot-card.png` 和 `docs/scenarios.png`；按背景色裁掉空白并补内边距。只支持 Windows（依赖 Edge 和 `System.Drawing`）。
+
+只改 `scenarios.png` 时也可以手动截图：
 
 ```powershell
 & "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" --headless=new --disable-gpu `
@@ -312,13 +339,13 @@ node docs/render-scenarios.cjs        # → docs/scenarios.html
 
 截图比页面高，底部会有一段背景色，按背景色 `#eceae6` 裁掉即可（内容下沿留 20px 左右）。
 
-`docs/screenshot-card.png` 是同一张图里第一列卡片的裁切，用于根 README 的产品截图；改卡片布局后需要重新裁。
+`docs/screenshot-card.png` 是侧栏卡片整体截图，由 `capture-shots.ps1` 从 `card-hero.html` 生成；改卡片布局后重跑脚本即可。
 
 ### 数据是写死的
 
 脚本把「现在」固定成 `2026-10-29 15:40 (UTC+8)`，并把全局 `Date` 固定在同一时刻，因此重置倒计时、「x 分钟前」、趋势日期和预测斜率都可重复；花费、tokens、模型、趋势曲线本身是常量，所以同一版本重复渲染出来的图基本一致。
 
-判断依据来自真实代码路径：`quota` / `windows` 为 `null` 就是没有 Go 额度，预测块缺 `monthly` 或周期点数不足就返回 `null`——这些分支与线上完全一致，只是数据换成了样例。
+判断依据来自真实代码路径：`quota` / `windows` 为 `null` 就是没有 Go 额度，预测块缺 `monthly` 或周期点数不足就返回 `null`——这些分支与线上完全一致，只是数据换成了样例。账户名、组织 id、服务账号名也都是虚构的（`acme` / `org_acme` / `main` / `ci`），不对应真实账户。
 
 ## 许可
 

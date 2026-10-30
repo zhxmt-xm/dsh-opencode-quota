@@ -72,7 +72,7 @@ const summaryBody = () =>
     totalOutputTokens: '1417014',
     totalCacheReadTokens: '559350784',
   })
-const identityBody = () => JSON.stringify({ items: [{ serviceUserId: 'svcacct_test', name: 'zhxmt' }] })
+const identityBody = () => JSON.stringify({ items: [{ serviceUserId: 'svcacct_test', name: 'sample-user' }] })
 const configBody = (org) =>
   JSON.stringify({ config: { provider: { opencode: { options: { headers: { 'x-opencode-org-id': org } } } } } })
 
@@ -98,11 +98,11 @@ globalThis.fetch = async (url, init) => {
       JSON.stringify({
         items: [
           {
-            account: { id: 'svcacct_test', name: 'zhxmt' },
+            account: { id: 'svcacct_test', name: 'sample-user' },
             keys: [{ tokenHint: 'oc-go...' }, { tokenHint: 'oc-console...' }],
           },
           {
-            account: { id: 'svcacct_other', name: 'zhxmt-test' },
+            account: { id: 'svcacct_other', name: 'sample-user-test' },
             keys: [{ tokenHint: 'oc-other...' }],
           },
         ],
@@ -279,11 +279,11 @@ accounts = result.json.accounts
 check('state: 不同组织拆成 2 张卡', accounts.length === 2, accounts.map((a) => a.id))
 check(
   'state: Key 上带出服务账号',
-  accounts.some((a) => a.name === 'zhxmt-test' && a.keys.some((k) => k.serviceAccount === 'zhxmt-test')),
+  accounts.some((a) => a.name === 'sample-user-test' && a.keys.some((k) => k.serviceAccount === 'sample-user-test')),
   accounts,
 )
 
-const orgOther = accounts.find((a) => a.name === 'zhxmt-test')
+const orgOther = accounts.find((a) => a.name === 'sample-user-test')
 goStatus = 404
 result = await call(`/api/opencode-quota/usage?account=${encodeURIComponent(orgOther.id)}&fresh=1`)
 check('usage: 没有订阅时 kind=console', result.json && result.json.kind === 'console' && result.json.quota === null, result.json)

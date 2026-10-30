@@ -142,8 +142,8 @@ const models = [
 
 /** 基线与各种「缺数据」变体。 */
 const VIEW_BASE = {
-  id: 'acc',
-  name: 'zhxmt',
+  id: 'org_acme',
+  name: 'acme',
   kind: 'go',
   configured: true,
   keys: [{ kind: 'go', ref: 'R1', configured: true, source: 'file' }],
@@ -355,6 +355,145 @@ const LIGHT = `
   --dsw-alias-border-l4:rgba(0,0,0,.16);
   --dsw-alias-brand-primary:#2f6fed;
 `
+
+/* ---------- 设置页 ---------- */
+const settingsEntry = reg.get('settings.section')
+injected.prefs.set({
+  account: 'org_acme',
+  sa: '',
+  style: 'rail',
+  railColor: '#3b82f6',
+  intervalSec: 60,
+  trendRange: '7d',
+  trendMetric: 'cost',
+  order: ORDER,
+  hidden: [],
+})
+injected.store.set({
+  phase: 'ready',
+  accounts: [
+    {
+      id: 'org_acme',
+      name: 'acme',
+      members: ['main', 'ci'],
+      hasGo: true,
+      kind: 'go',
+      configured: true,
+      keys: [
+        {
+          kind: 'go',
+          ref: 'OPENCODE_GO_API_KEY',
+          name: 'opencode-go',
+          configured: true,
+          source: 'file',
+          serviceAccount: 'main',
+          serviceAccountId: 'sa_main',
+        },
+        {
+          kind: 'console',
+          ref: 'OPENCODE_API_KEY',
+          name: 'opencode',
+          configured: true,
+          source: 'env',
+          serviceAccount: 'ci',
+          serviceAccountId: 'sa_ci',
+        },
+      ],
+    },
+    {
+      id: 'org_acme_team',
+      name: 'acme-team@example.com',
+      members: ['team'],
+      hasGo: false,
+      kind: 'console',
+      configured: true,
+      keys: [
+        {
+          kind: 'console',
+          ref: 'OPENCODE_API_KEY',
+          name: 'opencode',
+          configured: true,
+          source: 'env',
+          serviceAccount: 'team',
+          serviceAccountId: 'sa_team',
+        },
+      ],
+    },
+  ],
+  accountId: 'org_acme',
+  view: { ...VIEW_GO, id: 'org_acme', name: 'acme' },
+  error: null,
+  busy: false,
+  fetchedAt: now - 95_000,
+})
+const settingsPage = toHtml(settingsEntry.component({ ...injected }))
+const settingsHtml = `<!doctype html><html lang="zh"><head><meta charset="utf-8">
+<style>.theme{${LIGHT}}</style>
+<style>html,body{margin:0;padding:0;background:#eceae6}body{font-family:"Segoe UI","Microsoft YaHei UI","Microsoft YaHei",system-ui,sans-serif;padding:24px}.oqc-page{margin:0 auto}</style>
+<style>${CSS}</style>
+</head><body class="theme">${settingsPage}</body></html>`
+fs.mkdirSync(OUT, { recursive: true })
+fs.writeFileSync(path.join(OUT, 'settings.html'), settingsHtml)
+console.log('written docs/settings.html', settingsHtml.length)
+
+/* ---------- 单块 / 单面板截图底稿 ---------- */
+const SHOTS = path.join(OUT, 'shots')
+const SHOT_CSS = `
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:#eceae6;-webkit-font-smoothing:antialiased}
+body{font-family:"Segoe UI","Microsoft YaHei UI","Microsoft YaHei",system-ui,sans-serif}
+.shot{width:100%}
+.shot .oqc-card{margin:0}
+.shotPage{padding:0;gap:0;max-width:none}
+`
+const shotPage = (body, width) => `<!doctype html><html lang="zh"><head><meta charset="utf-8">
+<style>.theme{${LIGHT}}</style>
+<style>${SHOT_CSS}</style>
+<style>${CSS}</style>
+</head><body class="theme"><div class="shot" style="width:${width}px">${body}</div></body></html>`
+
+/** 找出所有带指定 class 的 div（按 div 深度配对）。 */
+function divsWithClass(html, className) {
+  const tokens = []
+  const re = /<div\b[^>]*>|<\/div>/g
+  let match
+  while ((match = re.exec(html))) tokens.push({ at: match.index, text: match[0], close: match[0] === '</div>' })
+  const stack = []
+  const out = []
+  for (const token of tokens) {
+    if (token.close) {
+      const open = stack.pop()
+      if (open && open.hit) out.push({ start: open.start, end: token.at + 6, html: html.slice(open.start, token.at + 6) })
+      continue
+    }
+    const classMatch = /class="([^"]*)"/.exec(token.text)
+    const classes = classMatch ? classMatch[1].split(/\s+/) : []
+    stack.push({ start: token.at, hit: classes.includes(className) })
+  }
+  return out
+}
+
+fs.mkdirSync(SHOTS, { recursive: true })
+const writeShot = (name, body, width) => {
+  fs.writeFileSync(path.join(SHOTS, `${name}.html`), shotPage(body, width))
+}
+for (const id of ORDER) {
+  const block = blockHtml(VIEW_GO, id)
+  if (!block) throw new Error(`missing block ${id}`)
+  writeShot(`card-${id}`, `<div class="oqc-card" data-style="rail" style="--oqc-rail-color:#3b82f6">${block}</div>`, 300)
+}
+writeShot('card-hero', renderCard(VIEW_GO), 300)
+const panels = divsWithClass(settingsPage, 'oqc-panel')
+if (panels.length !== 3) throw new Error(`expected 3 settings panels, got ${panels.length}`)
+const PANEL_SHOTS = ['settings-account', 'settings-display', 'settings-preview']
+panels.forEach((panel, index) => {
+  writeShot(PANEL_SHOTS[index], `<div class="oqc-page oqc-shotPage">${panel.html}</div>`, 640)
+})
+console.log('written docs/shots/*.html')
+
+/** 旧的账户形态参考图仍用 panel 样式，避免这次加截图顺带改掉它。 */
+injected.prefs.set({ order: ORDER, hidden: [], style: 'panel' })
+
 const PAGE_CSS = `
 *{box-sizing:border-box}
 html,body{margin:0;padding:0;background:#eceae6;-webkit-font-smoothing:antialiased}
