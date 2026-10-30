@@ -43,21 +43,26 @@ if (!lstatSync(profileDir, { throwIfNoEntry: false })) {
   process.exit(1)
 }
 
-/** 当前 node_modules 里装的是 link 还是 GitHub 版。 */
-function currentState() {
+/** 当前 node_modules 里装的是 link / github / none。 */
+function installedState() {
   const info = lstatSync(pkgDir, { throwIfNoEntry: false })
-  if (!info) return '未安装'
-  return info.isSymbolicLink() ? '本地 link' : 'GitHub 版'
+  if (!info) return 'none'
+  return info.isSymbolicLink() ? 'link' : 'github'
+}
+
+function stateLabel(state) {
+  return state === 'link' ? '本地 link' : state === 'github' ? 'GitHub 版' : '未安装'
 }
 
 /** 没有命令行参数时，用 1/2 选择目标来源。 */
 async function chooseSource() {
   const rl = createInterface({ input: process.stdin, output: process.stdout })
-  console.log(`当前安装：${currentState()}`)
+  const state = installedState()
+  console.log(`当前安装：${stateLabel(state)}`)
   console.log('切换前请先完全退出 DSH。')
   console.log('')
-  console.log(`  1) 本地 link   ${repoRoot}`)
-  console.log('  2) GitHub      github:zhxmt-xm/dsh-opencode-quota')
+  console.log(`  1) 本地 link${state === 'link' ? '（当前）' : ''}   ${repoRoot}`)
+  console.log(`  2) GitHub${state === 'github' ? '（当前）' : ''}      github:zhxmt-xm/dsh-opencode-quota`)
   console.log('')
   let answer
   try {
@@ -72,6 +77,12 @@ async function chooseSource() {
 }
 
 if (!source) source = await chooseSource()
+
+const state = installedState()
+if (state === source) {
+  console.log(`当前已经是${stateLabel(state)}，不需要切换。`)
+  process.exit(0)
+}
 
 if (process.platform === 'win32') {
   const check = spawnSync('tasklist', ['/FI', 'IMAGENAME eq DeepSeek Harness.exe', '/NH'], {
