@@ -190,7 +190,7 @@
 .oqc-gaugeArc{display:block;width:150px;height:84px;overflow:visible}
 .oqc-gauge text{font-family:inherit;font-variant-numeric:tabular-nums}
 .oqc-table{display:flex;flex-direction:column;gap:0}
-.oqc-tr{position:relative;display:grid;grid-template-columns:36px repeat(3,minmax(0,1fr));column-gap:14px;align-items:baseline;min-width:0;padding:6px 0}
+.oqc-tr{position:relative;display:grid;grid-template-columns:clamp(33px,calc((100% - 150px)/2 - 7px),69px) repeat(3,minmax(0,1fr));column-gap:14px;align-items:baseline;min-width:0;padding:6px 0}
 .oqc-tr:first-child{padding-top:0}
 .oqc-tr:last-child{padding-bottom:0}
 .oqc-tr+.oqc-tr::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;pointer-events:none;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--dsw-alias-label-primary) 12%,transparent) 10%,color-mix(in srgb,var(--dsw-alias-label-primary) 12%,transparent) 90%,transparent)}
