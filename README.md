@@ -28,7 +28,7 @@
 <div align="center">
   <img src="docs/screenshot-card.png" alt="侧栏额度卡片：用量、额度、预测、趋势、模型五个分块" width="320">
   <br>
-  <sub>侧栏卡片（浅色主题）：用量 · 额度 · 预测 · 趋势 · 模型</sub>
+  <sub>侧栏卡片（浅色主题，示意数据）：用量 · 额度 · 预测 · 趋势 · 模型</sub>
 </div>
 
 ## 为什么用它
@@ -57,10 +57,10 @@ OpenCode Go 的额度分散在几个接口里：滚动窗口、周窗口、月�
 
 ### 设置 → OpenCode 套餐
 
-- **账户**：列出 DSH 里的账户和各自 provider 凭据（只读，Key 在 DSH 的 provider 设置里改）；当前账户打绿色「当前」tag，其余可「切换」；右上「刷新数据」立即重读；
+- **账户**：列出 DSH 里的账户和各自 provider 凭据（只读，Key 在 DSH 的 provider 设置里改）；当前账户打绿色「当前」tag，其余可「切换」；右上「刷新数据」立即重读；下方可选刷新间隔（30 秒 / 1 分钟 / 5 分钟 / 15 分钟）；
 - **卡片展示**：预览五个分块，勾选控制是否显示在侧栏，拖拽标题调整顺序，`?` 里有说明；
 - **趋势图**：7 天 / 24 小时切换，花费 / tokens / 请求数切换；
-- **显示**：色条开关与颜色、四档进度条（名称 / 区间 / 颜色）、刷新间隔（30 秒 / 1 分钟 / 5 分钟 / 15 分钟）。
+- **显示**：色条开关与颜色、四档进度条（名称 / 区间 / 颜色）。
 
 <details>
 <summary><b>查看三种账户形态与每个分块的空态参考图</b></summary>
@@ -107,8 +107,8 @@ dsh plugin --profile web add github:zhxmt-xm/dsh-opencode-quota
 也可以在 GUI 里安装：左侧栏 → **插件** → **添加插件**，粘贴本仓库绝对路径，安装后点 **立即启用**。
 
 ```powershell
-# Windows PowerShell
-dsh plugin --profile desktop add "link:C:\code\dsh-opencode-quota"
+# Windows PowerShell（把路径换成你的仓库目录）
+dsh plugin --profile desktop add "link:C:\path\to\dsh-opencode-quota"
 ```
 
 ```sh
@@ -131,7 +131,7 @@ Key 也可以走环境变量回退：`OPENCODE_GO_API_KEY` / `OPENCODE_API_KEY`�
 ### 更新 / 卸载
 
 ```sh
-# 更新：重新执行一次 add 即可
+# 更新：重新执行 add；如果没拉到新提交，先 remove 再 add
 dsh plugin --profile desktop add github:zhxmt-xm/dsh-opencode-quota
 
 # 卸载
@@ -150,7 +150,7 @@ dsh plugin --profile desktop remove @local/dsh-opencode-quota
 - 只判断有没有 Go 订阅，分不清 Go / Go Plus；
 - 预测只用当前计费周期的每日花费，数据不足两个点时隐藏；
 - 模型只有区间总量，没有按模型按天的数据；
-- 自定义 provider 指向非 `opencode.ai` 中转站时不会被识别；
+- provider id 不是 `opencode` / `opencode-*`，且 `baseURL` 不指向 `opencode.ai` 时不会被识别；
 - 设置导航图标是 DOM 补丁，DSH 改导航结构时需要适配。
 
 完整原因与处理方式见 [开发与原理 → 已知限制](docs/README.md#已知限制)。

@@ -38,7 +38,7 @@ flowchart LR
   subgraph DSH[DeepSeek Harness]
     S[llm-pi-ai 设置<br/>providers] --> H[Host: index.js]
     C[credentials<br/>凭据库] --> H
-    H --> R[/api/opencode-quota/*]
+    H --> R["/api/opencode-quota/*"]
     R --> B[Client: client.js]
     B --> U[侧栏卡片]
     B --> P[设置页]
@@ -59,15 +59,16 @@ flowchart LR
 | `index.js` | Host 半边：账户发现、订阅探测、上游请求、路由、安全校验、客户端日志 |
 | `client.js` | 浏览器半边：侧栏卡片、设置页、图表、偏好、词典、CSS、设置导航 logo 补丁 |
 | `cordis.patch.yml` | bundle patch：把插件插入 profile |
-| `locale/zh.json`、`locale/en.json` | 设置分区的标题与描述（DSH 插件元数据） |
+| `locale/zh.json`、`locale/en.json` | 插件管理里的标题与描述（DSH 插件元数据） |
 | `icon.svg` | 插件 logo |
 | `LICENSE` | 插件代码的 MIT 许可 |
 | `.smoke.mjs` | 无框架冒烟测试：模拟 DSH 上下文与上游，验证路由、合并、降级、安全 |
 | `docs/render-scenarios.cjs` | 用迷你 React 替身渲染 `client.js`，生成参考图底稿 |
+| `docs/scenarios.html` | 生成的静态底稿，交给浏览器截图 |
 | `docs/scenarios.png` | 账户形态 × 分块空态参考图 |
 | `docs/screenshot-card.png` | 根 README 用的侧栏卡片截图（从参考图裁出） |
 
-设置分区的标题/描述在 `locale/*.json`；卡片与设置页正文的词典在 `client.js` 的 `zh` / `en` 对象里，改文案时两处都要看。
+插件管理里的标题/描述在 `locale/*.json`；设置分区 label 与卡片/设置页正文词典在 `client.js` 的 `zh` / `en` 对象里，改文案时两处都要看。
 
 ## Host 半边
 
@@ -87,11 +88,12 @@ flowchart LR
 2. provider id 以 `opencode-` 开头（或就是 `opencode`），或 `baseURL` 指向 `opencode.ai`，才算候选；
 3. 每个 provider 的 Key 引用优先取 `apiKeyEnv`，缺失时按预设回落：Go → `OPENCODE_GO_API_KEY`，Console → `OPENCODE_API_KEY`；
 4. 用 Key 解析身份：
-   - 先调 `/console/api/service-accounts`，用 Key 前缀匹配 `keys[].tokenHint`，得到服务账号；
-   - 再调 `/console/api/usage/users` 拿用户；
-   - 再调 `/console/api/config`，从 provider header 里取 `x-opencode-org-id`；
-   - 组织 id 优先作为账户 id；组织名优先用 `/console/api/members` 里 owner 的邮箱；
-   - 都读不到时退回 `ref:<apiKeyEnv>`，保证不误合并。
+   - 优先调 `/console/api/service-accounts`，用 Key 前缀匹配 `keys[].tokenHint`，得到服务账号；
+   - 匹配不到服务账号时，调 `/console/api/usage/users` 拿用户；
+   - 调 `/console/api/config`，从 provider header 里取 `x-opencode-org-id`；
+   - 调 `/console/api/members`，用 owner 的邮箱作为组织名；
+   - 账户 id 优先用组织 id，其次服务账号 id，最后用户 id；
+   - 都读不到时退回 `ref:<apiKeyEnv 或回退变量>`，保证不误合并。
 5. 同一个组织下的多个 provider 合并成一张卡；能识别出真实账户时，没配 Key 的兜底 provider 不会单独画空账户。
 
 `kind` 只是 DSH 的连接预设（决定优先用哪把 Key），不代表计费方式；订阅与否由接口探测。
@@ -244,7 +246,7 @@ DSH 里的 `opencode-go` / `opencode` 只是两个连接预设，不能拿来判
 - **预测只用当前计费周期**：没有额度历史接口，预测来自当前周期的每日花费；周期数据不足两个点时隐藏预测块。
 - **没有按模型按天的数据**：`cost-by-day` 不接受模型维度，模型只有区间总量。
 - **设置导航图标是 DOM 补丁**：`settings.section` 只投影 id / order / label，没有 icon 字段；插件在设置弹窗里按当前分区名认领本行，隐藏默认齿轮并换成本地 logo，语言切换会重新同步。上游改导航 DOM 时需要跟着调整。
-- 自定义 provider 若指向非 `opencode.ai` 的中转站，不会被识别。
+- provider id 不是 `opencode` / `opencode-*`，且 `baseURL` 不指向 `opencode.ai` 时，不会被识别；指向其它中转站的自定义 provider 需要按这两个条件命名或配置地址。
 - 额度接口是组织级，服务账号筛选只作用于 Console 花费与模型，不影响额度数字。
 
 ## 本地开发
@@ -258,7 +260,7 @@ DSH 里的 `opencode-go` / `opencode` 只是两个连接预设，不能拿来判
 ### 安装到本地 profile
 
 ```powershell
-dsh plugin --profile desktop add "link:C:\code\dsh-opencode-quota"
+dsh plugin --profile desktop add "link:C:\path\to\dsh-opencode-quota"
 ```
 
 也可以在 GUI 里：左侧栏 → **插件** → **添加插件**，粘贴本仓库绝对路径，安装后点 **立即启用**。
@@ -289,7 +291,7 @@ node .smoke.mjs
 
 ## 参考图
 
-`scenarios.png` — 三种账户形态 × 每个分块的空态（浅色主题，1344 × 2973）。
+`scenarios.png` — 三种账户形态 × 每个分块的空态（浅色主题，1344 × 3092）。
 
 - **A 段**：每种形态都保留全部五个分块。产品里会整块隐藏的分块画成虚线禁用块，位置不动，所以三列能按同一顺序横向对比。
 - **B 段**：每个分块的不同空态各占一格，下面是该状态的说明。
@@ -314,9 +316,9 @@ node docs/render-scenarios.cjs        # → docs/scenarios.html
 
 ### 数据是写死的
 
-脚本把「现在」固定成 `2026-10-29 15:40 (UTC+8)`，只影响重置倒计时与预测斜率；花费、tokens、模型、趋势曲线都是常量，所以同一版本重复渲染出来的图基本一致。
+脚本把「现在」固定成 `2026-10-29 15:40 (UTC+8)`，并把全局 `Date` 固定在同一时刻，因此重置倒计时、「x 分钟前」、趋势日期和预测斜率都可重复；花费、tokens、模型、趋势曲线本身是常量，所以同一版本重复渲染出来的图基本一致。
 
-判断依据来自真实代码路径：`windows` 为 `null` 就是没有 Go 额度，预测块缺 `monthly` 或周期点数不足就返回 `null`——这些分支与线上完全一致，只是数据换成了样例。
+判断依据来自真实代码路径：`quota` / `windows` 为 `null` 就是没有 Go 额度，预测块缺 `monthly` 或周期点数不足就返回 `null`——这些分支与线上完全一致，只是数据换成了样例。
 
 ## 许可
 

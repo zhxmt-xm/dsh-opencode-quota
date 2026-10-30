@@ -2,7 +2,7 @@
  * OpenCode Go 套餐额度的浏览器半边。
  *
  * - `sidebar.footer.action`：设置按钮上方的额度卡片（侧栏尺寸）；
- * - `settings.section`：设置里的「OpenCode 套餐」页，含账户 Key、颜色与刷新间隔。
+ * - `settings.section`：设置里的「OpenCode 套餐」页，含账户与只读凭据状态、颜色与刷新间隔。
  *
  * 数据来自 Host 的 `/api/opencode-quota/*`；偏好（进度条颜色、刷新间隔）存在
  * 浏览器 localStorage，只影响本机显示。
@@ -84,7 +84,7 @@ window.__ModuleLoader__.load({
       durHour: '{h}小时{m}分',
       durMinute: '{m}分钟',
       noKey: '未配置 Key',
-      noKeyHint: '在「设置 → OpenCode 套餐」里填写',
+      noKeyHint: '在 DSH 的 provider 设置里配置',
       loading: '读取中…',
       errorShort: '读取失败',
       retry: '重试',
@@ -107,16 +107,10 @@ window.__ModuleLoader__.load({
       manageTip: '勾选的分块显示在侧栏，取消勾选即隐藏；拖拽标题还能调整顺序。',
       refreshData: '刷新数据',
       refreshHint: '重新向 OpenCode 读取一次额度与花费',
-      save: '保存',
-      saving: '保存中…',
-      saved: '已保存',
-      clear: '清除',
-      cleared: '已删除',
       needKey: '这个账户还没有 Key，请在 DSH 的 provider 设置里配置',
       refreshing: '刷新中…',
       readFailed: '读取失败',
       footnote: '数据来自 {base}，每 {interval} 自动刷新。',
-      envHint: '环境变量 OPENCODE_GO_API_KEY 可作为回退值；这里保存的值优先。',
       appearanceTitle: '显示',
       levelsTitle: '进度条分级',
       levelsReset: '恢复默认',
@@ -195,7 +189,7 @@ window.__ModuleLoader__.load({
       durHour: '{h}h {m}m',
       durMinute: '{m}m',
       noKey: 'No key',
-      noKeyHint: 'Set one in Settings → OpenCode plan',
+      noKeyHint: 'Configure it in the DSH provider settings',
       loading: 'Loading…',
       errorShort: 'Unavailable',
       retry: 'Retry',
@@ -218,16 +212,10 @@ window.__ModuleLoader__.load({
       manageTip: 'Checked blocks show in the sidebar — uncheck to hide. Drag a title to reorder.',
       refreshData: 'Refresh data',
       refreshHint: 'Re-read quota and spend from OpenCode',
-      save: 'Save',
-      saving: 'Saving…',
-      saved: 'Saved',
-      clear: 'Clear',
-      cleared: 'Deleted',
       needKey: 'No key for this account — set it in the DSH provider settings',
       refreshing: 'Refreshing…',
       readFailed: 'Could not read usage',
       footnote: 'Read from {base}, refreshed every {interval}.',
-      envHint: 'The OPENCODE_GO_API_KEY environment variable acts as a fallback; a stored value wins.',
       appearanceTitle: 'Appearance',
       levelsTitle: 'Bar levels',
       levelsReset: 'Reset defaults',

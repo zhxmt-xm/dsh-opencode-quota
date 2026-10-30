@@ -32,6 +32,10 @@ globalThis.document = {
   body: { appendChild: noop },
 }
 globalThis.localStorage = { getItem: () => null, setItem: noop }
+globalThis.MutationObserver = class {
+  observe() {}
+  disconnect() {}
+}
 globalThis.fetch = async () => new Response('{}', { status: 200 })
 
 let hookIndex = 0
@@ -72,8 +76,19 @@ const t = (key, vars) => {
 /* ---------- 数据 ---------- */
 const DAY = 86400000
 const HOUR = 3600000
-/** 固定「现在」，参考图每次渲染都一致；改这个值只会让倒计时/预测跟着平移。 */
+/** 固定「现在」，参考图每次渲染都一致；改这个值会让倒计时、相对时间、趋势日期和预测一起平移。 */
 const now = Date.parse('2026-10-29T07:40:00Z')
+/** 让倒计时、趋势日期和「x 分钟前」都停在同一时刻，截图才可重复。 */
+const RealDate = Date
+class FixedDate extends RealDate {
+  constructor(...args) {
+    super(...(args.length > 0 ? args : [now]))
+  }
+  static now() {
+    return now
+  }
+}
+globalThis.Date = FixedDate
 const iso = (at) => new Date(at).toISOString()
 const resetAt = Date.parse('2026-11-27T08:26:49Z')
 const startAt = Date.parse('2026-10-27T08:26:49Z')
