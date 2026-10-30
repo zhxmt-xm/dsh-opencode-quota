@@ -6,7 +6,7 @@
   "description": "OpenCode Go 套餐额度面板：在左侧栏设置上方显示订阅额度与用量，并在设置里管理账户、展示与刷新。",
   "license": "MIT",
   "scripts": {
-    "start": "node switch-source.mjs"
+    "start": "node start.mjs"
   },
   "exports": {
     ".": "./index.js",

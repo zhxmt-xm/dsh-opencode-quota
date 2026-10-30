@@ -3,8 +3,8 @@
  * 在 desktop profile 的本地 link 安装与 GitHub 安装之间切换。
  *
  *   npm start              # 交互选择
- *   node switch-source.mjs link
- *   node switch-source.mjs github
+ *   node start.mjs link
+ *   node start.mjs github
  *
  * 为什么要这个脚本：DSH 当前插件管理器卸载 `link:` 依赖时不会删除
  * `node_modules` 里的 junction；直接 add 另一种来源会 EPERM。这里先清掉
@@ -27,7 +27,7 @@ const repoRoot = dirname(fileURLToPath(import.meta.url))
 let source = process.argv[2]
 
 if (source !== undefined && source !== 'link' && source !== 'github') {
-  console.error('用法：npm start，或 node switch-source.mjs <link|github>')
+  console.error('用法：npm start，或 node start.mjs <link|github>')
   process.exit(2)
 }
 
