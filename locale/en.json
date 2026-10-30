@@ -1,6 +1,6 @@
 {
   "meta": {
     "title": "OpenCode Plan",
-    "description": "Shows OpenCode Go subscription quota above the sidebar Settings entry and stores the account key from a Settings page."
+    "description": "Shows OpenCode Go subscription quota and usage above the sidebar Settings entry, with account, display and refresh controls in Settings."
   }
 }

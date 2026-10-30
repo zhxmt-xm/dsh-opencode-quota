@@ -1,6 +1,6 @@
 {
   "meta": {
     "title": "OpenCode 套餐",
-    "description": "在左侧栏设置按钮上方显示 OpenCode Go 订阅额度，并在设置页里保存账户 Key。"
+    "description": "在左侧栏设置按钮上方显示 OpenCode Go 订阅额度与用量，并在设置页里管理账户、展示与刷新。"
   }
 }

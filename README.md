@@ -1,84 +1,176 @@
-# OpenCode 套餐面板（DSH 插件）
+<div align="center">
+  <img src="icon.svg" width="88" alt="OpenCode 套餐面板 logo">
+</div>
 
-在 DeepSeek Harness 的侧栏显示 OpenCode Go 订阅额度，并在设置里提供账户、外观与数据视图。
+<h1 align="center">OpenCode 套餐面板</h1>
 
-## 安装
+<p align="center">
+  <b>在 DeepSeek Harness 侧栏，随时看清 OpenCode Go 的额度、花费和趋势。</b>
+</p>
 
-本地目录安装（GUI）：
+<p align="center">
+  <img alt="DeepSeek Harness 0.2.x" src="https://img.shields.io/badge/DeepSeek%20Harness-0.2.x-2f6fed">
+  <img alt="License MIT" src="https://img.shields.io/badge/license-MIT-2ea043">
+  <img alt="界面：中文 / English" src="https://img.shields.io/badge/%E7%95%8C%E9%9D%A2-%E4%B8%AD%E6%96%87%20%7C%20English-8b5cf6">
+  <img alt="数据：OpenCode Go / Console" src="https://img.shields.io/badge/%E6%95%B0%E6%8D%AE-OpenCode%20Go%20%2F%20Console-1f6feb">
+</p>
 
-1. 左侧栏 → **插件** → **添加插件**；
-2. 粘贴包目录绝对路径：`C:\code\dsh-opencode-quota`；
-3. 安装 → **立即启用**。
+<p align="center">
+  <a href="#安装">安装</a> ·
+  <a href="#界面">界面</a> ·
+  <a href="#账户形态">账户形态</a> ·
+  <a href="docs/README.md">开发与原理</a>
+</p>
 
-命令行等价方式：
+> [!NOTE]
+> 这是 DeepSeek Harness 的第三方插件，不是 OpenCode 官方产品。数据直接来自你配置的 OpenCode 账户。
 
-```bash
-dsh plugin --profile desktop add "link:C:\code\dsh-opencode-quota"
-```
+<div align="center">
+  <img src="docs/screenshot-card.png" alt="侧栏额度卡片：用量、额度、预测、趋势、模型五个分块" width="320">
+  <br>
+  <sub>侧栏卡片（浅色主题）：用量 · 额度 · 预测 · 趋势 · 模型</sub>
+</div>
 
-安装后**完全退出应用再启动**（Host 半边需要重新加载）。
+## 为什么用它
 
-## 显示内容
+OpenCode Go 的额度分散在几个接口里：滚动窗口、周窗口、月窗口，外加 Console 的花费与 token。这个插件把它们收进一张侧栏卡片，不用打开网页控制台，也不用自己算。
 
-侧栏卡片（设置按钮上方）：
+- **一眼看到最紧的额度**：滚动 5 小时 / 本周 / 本月三个窗口，进度条按四档变色，带重置倒计时。
+- **知道今天花了多少**：今日花费、请求数、tokens，以及本周 / 本月汇总。
+- **看见趋势**：7 天 / 24 小时，花费 / tokens / 请求数随时切换。
+- **提前知道会不会用完**：按当前计费周期的花费速度外推，标出 50% / 100% 的预计日期。
+- **知道钱花在哪个模型**：按花费排序的模型条形图。
+- **多账户不打架**：同一组织的 Key 合并成一张卡，不同组织分开；可切换账户，花费可按服务账号筛选。
+- **侧栏收起也能看**：折叠时退化为一个百分比/金额小方块。
+- **不打扰**：跟随 DSH 主题、中英双语、无外部 CDN，偏好只存在本机。
+
+## 界面
+
+### 侧栏卡片
 
 - 三个额度窗口：滚动 5 小时 / 本周 / 本月，含重置倒计时与进度条；
-- 今日花费、请求数、tokens；
-- 最近 7 天花费走势；
-- 收起侧栏时退化为一个百分比/金额小方块。
-
-设置 → **OpenCode 套餐**：
-
-- 账户：列出 DSH 里的账户和各自 provider 凭据（只读，Key 在 DSH 的 provider 设置里改）；当前账户打绿色「当前」tag，其余可「切换」——切换即自动刷新，右上「刷新数据」也能立刻重读；
-- 卡片展示：预览五个分块，勾选控制是否显示在侧栏，拖拽调整顺序，`?` 里有说明；
-- 趋势图：7 天 / 24 小时切换，花费 / tokens / 请求数切换；
-- 本周与上周对比、缓存命中率；
+- 今日花费、请求数、tokens，以及本周 / 本月汇总；
+- 最近 7 天或 24 小时的花费 / tokens / 请求数趋势；
+- 当前计费周期的额度预测：按当前速度是否会在重置前用完；
 - 模型花费条形图；
-- 额度走势与"按当前速度是否会在重置前用完"的预测；
-- 外观：进度条分级（四档，名称/区间/颜色/是否跟随主题）、刷新间隔。
+- 账户切换菜单：组织一行，组织下的服务账号各一行。
+
+### 设置 → OpenCode 套餐
+
+- **账户**：列出 DSH 里的账户和各自 provider 凭据（只读，Key 在 DSH 的 provider 设置里改）；当前账户打绿色「当前」tag，其余可「切换」；右上「刷新数据」立即重读；
+- **卡片展示**：预览五个分块，勾选控制是否显示在侧栏，拖拽标题调整顺序，`?` 里有说明；
+- **趋势图**：7 天 / 24 小时切换，花费 / tokens / 请求数切换；
+- **显示**：色条开关与颜色、四档进度条（名称 / 区间 / 颜色）、刷新间隔（30 秒 / 1 分钟 / 5 分钟 / 15 分钟）。
+
+<details>
+<summary><b>查看三种账户形态与每个分块的空态参考图</b></summary>
+<br>
+<img src="docs/scenarios.png" alt="三种账户形态与每个分块的空态参考图">
+</details>
 
 ## 账户形态
 
 卡片的五个分块由**接口数据**决定，不是配置开关，也不看 provider 名：
 
-| 形态 | 触发条件 | 渲染结果 |
-| --- | --- | --- |
-| 只有 Go 订阅 | 任一 Key 调 `GET /inference/go/v1/usage` 返回窗口 | 五块齐全 |
-| 没有 Go 订阅（Console 用量） | 该接口 404（`NOT_SUBSCRIBED`） | 额度、预测整块隐藏；用量没有油表，只留表格 |
-| Go + Console 用量 | 同一个组织既有 Go 订阅、又有 Console 花费 | 合并成一张卡，与「只有 Go」一致 |
+| 形态 | 你会看到 |
+| --- | --- |
+| 只有 Go 订阅 | 五个分块齐全 |
+| 只有 Console 按量 | 额度与预测隐藏，保留用量、趋势、模型 |
+| Go + Console | 合并成一张卡，与「只有 Go」一致 |
 
-DSH 里的 `opencode-go` / `opencode` 只是两个连接预设，不能拿来判断计费方式：同一个组织的任意服务账号 Key 都能读 Go 额度，额度本身也是组织级共享的。插件用 `/inference/go/v1/usage` 的 200/404 做订阅探测，provider id 只决定优先用哪把 Key。
+插件用 `GET /inference/go/v1/usage` 的 200/404 判断有没有 Go 订阅，provider id 只决定优先用哪把 Key。完整规则见 [开发与原理 → 账户形态](docs/README.md#账户形态)。
 
-五个分块的空态（额度缺百分比、用量为空、预测数据不足、趋势无数据、模型无记录）与对应截图见 [docs/scenarios.png](docs/scenarios.png)。
+## 安装
 
-## 数据来源
+### 环境
 
-| 数据 | 接口 | 作用域 |
-| --- | --- | --- |
-| 三个额度窗口 | `GET https://opencode.ai/inference/go/v1/usage` | **组织级**，不支持按服务账号过滤 |
-| 是否 Go 订阅 | 同一个 `GET /inference/go/v1/usage`：200 = 有，404 = 无 | 组织级；任一服务账号 Key 都能探测 |
-| 今日花费与 token | `GET https://opencode.ai/console/api/usage/summary?since=…` | 默认组织，可加 `serviceAccountId=` |
-| 按天/按小时花费 | `GET https://opencode.ai/console/api/usage/cost-by-day?range=…` | 同上 |
-| 按模型花费 | `GET https://opencode.ai/console/api/usage/models` | 同上 |
-| 账户身份 | `GET /console/api/service-accounts` 的 `keys[].tokenHint`（Key 前缀）匹配出服务账号；读不到时退回 `/usage/users`、再退回 `/config` 的 org id | 组织级列表 |
+- DeepSeek Harness Desktop 0.2.x（开发环境 `0.2.1-rc.5`；Web profile 同理）；
+- 一个 OpenCode Go 订阅，或仅有 Console 用量的 OpenCode 账户；
+- 能访问 `opencode.ai`。
 
-`/usage/users` 不区分 Key（同组织的两个 Key 都返回同一个用户），所以身份优先用 `service-accounts` 的 `tokenHint` 前缀匹配。花费与模型按服务账号过滤，额度是组织共享的一份。
+### 从 GitHub 安装（推荐）
 
-Key 来自 DSH 凭据库：优先用 `llm-pi-ai` 里该 provider 的 `apiKeyEnv`，缺省回落到 `OPENCODE_GO_API_KEY` / `OPENCODE_API_KEY`。
+```sh
+dsh plugin --profile desktop add github:zhxmt-xm/dsh-opencode-quota
+```
 
-## 安全
+Web 版 profile：
 
+```sh
+dsh plugin --profile web add github:zhxmt-xm/dsh-opencode-quota
+```
+
+> 安装后**完全退出 DSH 再启动**，Host 半边才会加载。
+
+### 本地开发安装
+
+也可以在 GUI 里安装：左侧栏 → **插件** → **添加插件**，粘贴本仓库绝对路径，安装后点 **立即启用**。
+
+```powershell
+# Windows PowerShell
+dsh plugin --profile desktop add "link:C:\code\dsh-opencode-quota"
+```
+
+```sh
+# macOS / Linux
+dsh plugin --profile desktop add "link:$PWD"
+```
+
+`link:` 直接引用本地目录，改代码后重启宿主即可，不需要重新安装。
+
+### 配置 Key
+
+插件读取 DSH 里已有的 `opencode` / `opencode-go` provider 凭据：
+
+1. 打开 DSH 设置 → Providers（`llm-pi-ai`）；
+2. 配置 `opencode-go` 和/或 `opencode` 的 API Key；
+3. 回到「设置 → OpenCode 套餐」，点「刷新数据」。
+
+Key 也可以走环境变量回退：`OPENCODE_GO_API_KEY` / `OPENCODE_API_KEY`。插件设置页只读，不会把 Key 下发到浏览器。
+
+### 更新 / 卸载
+
+```sh
+# 更新：重新执行一次 add 即可
+dsh plugin --profile desktop add github:zhxmt-xm/dsh-opencode-quota
+
+# 卸载
+dsh plugin --profile desktop remove @local/dsh-opencode-quota
+```
+
+## 数据与隐私
+
+- Key 只在 DSH Host 进程内使用，不下发到浏览器、不写日志；
+- 额度数据不落盘；界面偏好存在浏览器 `localStorage`；
 - 所有 Host 路由只接受本机回环请求，并校验 `Origin` / `sec-fetch-site`；
-- Key 只在 Host 进程内使用，不下发到浏览器、不写日志；
-- 额度数据不落盘；界面偏好写在浏览器 `localStorage`，客户端错误日志写到 `$DSH_HOME/opencode-quota/client.log`。
+- 上游请求 12 秒超时、拒绝重定向、响应体上限 256 KB。
 
 ## 已知限制
 
-- **读不到套餐类型**（Go / Go Plus）：控制台的 `GET /console/api/orgs/current` 里其实有 `hasGoSubscription` / `goSubscription`，但服务账号 Key 调它返回 403，只接受控制台会话；`/api/internal/orgs/:orgId/go/status` 也不对外。插件因此只判断「有没有 Go 订阅」，分不清 Go / Go Plus。
-- **预测只用当前计费周期**：没有额度历史接口，预测来自当前周期的每日花费；周期数据不足两个点时隐藏预测块。
-- **没有按模型按天的数据**：`cost-by-day` 不接受模型维度，模型只有区间总量。
-- 自定义 provider 若指向非 `opencode.ai` 的中转站，不会被识别。
+- 只判断有没有 Go 订阅，分不清 Go / Go Plus；
+- 预测只用当前计费周期的每日花费，数据不足两个点时隐藏；
+- 模型只有区间总量，没有按模型按天的数据；
+- 自定义 provider 指向非 `opencode.ai` 中转站时不会被识别；
+- 设置导航图标是 DOM 补丁，DSH 改导航结构时需要适配。
+
+完整原因与处理方式见 [开发与原理 → 已知限制](docs/README.md#已知限制)。
+
+## 开发
+
+- 原生 ESM + React（由 DSH 提供），无构建步骤、无运行时依赖；
+- Host：`index.js`；Client：`client.js`；bundle patch：`cordis.patch.yml`；
+- 冒烟测试：`node .smoke.mjs`（当前 32 项全部通过）；
+- 参考图生成：`node docs/render-scenarios.cjs`。
+
+架构、接口、缓存、偏好 schema、调试方式与发布检查见 [docs/README.md](docs/README.md)。
 
 ## 许可
 
-内嵌 Noto Sans SC 子集/完整字体，SIL OFL 1.1，详见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
+- 插件代码：MIT，见 [LICENSE](LICENSE)；
+- 内嵌 Noto Sans SC 字体：SIL OFL 1.1，见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
+
+---
+
+<div align="center">
+  <sub>Made for DeepSeek Harness · 数据来自 OpenCode</sub>
+</div>
