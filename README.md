@@ -23,7 +23,7 @@
 </p>
 
 > [!NOTE]
-> 这是 DeepSeek Harness 的第三方插件，不是 OpenCode 官方产品。数据直接来自你配置的 OpenCode 账户。
+> 这是 DeepSeek Harness 的第三方插件，数据来自 OpenCode 官方。
 
 <div align="center">
   <img src="docs/screenshot-card.png" alt="侧栏额度卡片：用量、额度、预测、趋势、模型五个分块" width="320">
@@ -217,25 +217,7 @@ dsh plugin --profile desktop remove @local/dsh-opencode-quota
 - 所有 Host 路由只接受本机回环请求，并校验 `Origin` / `sec-fetch-site`；
 - 上游请求 12 秒超时、拒绝重定向、响应体上限 256 KB。
 
-## 已知限制
-
-- 只判断有没有 Go 订阅，分不清 Go / Go Plus；
-- 预测只用当前计费周期的每日花费，数据不足两个点时隐藏；
-- 模型只有区间总量，没有按模型按天的数据；
-- provider id 不是 `opencode` / `opencode-*`，且 `baseURL` 不指向 `opencode.ai` 时不会被识别；
-- 设置导航图标是 DOM 补丁，DSH 改导航结构时需要适配。
-
-完整原因与处理方式见 [开发与原理 → 已知限制](docs/README.md#已知限制)。
-
-## 开发
-
-- 原生 ESM + React（由 DSH 提供），无构建步骤、无运行时依赖；
-- Host：`index.js`；Client：`client.js`；bundle patch：`cordis.patch.yml`；
-- 冒烟测试：`node .smoke.mjs`（当前 32 项全部通过）；
-- 参考图生成：`node docs/render-scenarios.cjs`；
-- 单块截图：`powershell -ExecutionPolicy Bypass -File docs/capture-shots.ps1`。
-
-架构、接口、缓存、偏好 schema、调试方式与发布检查见 [docs/README.md](docs/README.md)。
+架构、接口、已知限制、调试与发布检查见 [docs/README.md](docs/README.md)。
 
 ## 许可
 

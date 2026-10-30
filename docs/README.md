@@ -260,6 +260,13 @@ DSH 里的 `opencode-go` / `opencode` 只是两个连接预设，不能拿来判
 - DeepSeek Harness Desktop 0.2.x（当前开发环境 `0.2.1-rc.5`）；
 - 无运行时依赖，无构建步骤；`index.js` / `client.js` 直接发布。
 
+### 开发建议
+
+- 保持原生 ESM + React（由 DSH 提供），不要引入构建步骤或运行时依赖；
+- Host 逻辑集中在 `index.js`，浏览器 UI 在 `client.js`，bundle patch 在 `cordis.patch.yml`；
+- 改 UI 后先跑 `node .smoke.mjs`，再跑 `docs/capture-shots.ps1` 更新参考图和 README 截图；
+- 设置页的 Key 保持只读，Key 统一在 DSH 的 provider 设置里管理。
+
 ### 安装到本地 profile
 
 ```powershell
