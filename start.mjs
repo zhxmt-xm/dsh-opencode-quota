@@ -97,7 +97,7 @@ if (process.platform === 'win32') {
 /** 用当前平台的 shell 调用 dsh plugin。 */
 function runDsh(args, childEnv = process.env) {
   if (process.platform === 'win32') {
-    const line = ['dsh', ...args.map((arg) => `"${arg}"`)].join(' ')
+    const line = ['dsh', ...args.map((arg) => (/\s/.test(arg) ? `"${arg}"` : arg))].join(' ')
     return spawnSync(process.env.ComSpec || 'cmd.exe', ['/d', '/s', '/c', line], {
       cwd: repoRoot,
       env: childEnv,
