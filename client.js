@@ -16,6 +16,8 @@ window.__ModuleLoader__.load({
     const NS = 'opencode-quota'
     const API = '/api/opencode-quota'
     const PREFS_KEY = 'opencode-quota:prefs'
+    /** 设置页简介后的 GitHub 入口。 */
+    const REPO_URL = 'https://github.com/zhxmt-xm/dsh-opencode-quota'
     /** 四段固定区间，颜色直接决定进度条/图表用色；名称留空则用本地化默认名。 */
     const DEFAULT_TIERS = [
       { name: '', from: 0, to: 50, color: '#2ea043' },
@@ -143,6 +145,7 @@ window.__ModuleLoader__.load({
       minutesAgo: '{n}分钟前',
       hoursAgo: '{n}小时前',
       never: '尚未读取',
+      starCta: '好用？去 GitHub 点个 Star 吧',
     }
     const en = {
       limitsTitle: 'Limits',
@@ -248,6 +251,7 @@ window.__ModuleLoader__.load({
       minutesAgo: '{n}m ago',
       hoursAgo: '{n}h ago',
       never: 'not read yet',
+      starCta: 'Useful? Give it a star on GitHub',
     }
 
     const CSS = `
@@ -532,6 +536,10 @@ ${FONT_FACES}
 .oqc-rangeDash{flex:none;font-size:11px;color:var(--dsw-alias-label-tertiary)}
 .oqc-rangePct{flex:none;font-size:10.5px;color:var(--dsw-alias-label-tertiary)}
 .oqc-hint{margin:0;font-size:10.5px;font-weight:400;line-height:1.5;color:var(--dsw-alias-label-tertiary)}
+.oqc-star{display:inline;margin:0;padding:0;border:0;background:none;color:var(--dsw-alias-link,#3b82f6);font:inherit;font-weight:500;line-height:inherit;white-space:nowrap;text-decoration:none;border-radius:3px}
+.oqc-star:hover{text-decoration:underline;text-underline-offset:2px}
+.oqc-star:focus-visible{outline:none;box-shadow:0 0 0 2px color-mix(in srgb,var(--dsw-alias-link,#3b82f6) 30%,transparent)}
+.oqc-star svg{display:inline-block;width:11px;height:11px;margin-right:4px;vertical-align:-1px;color:#e3b341}
 .oqc-keyList{display:flex;flex-direction:column;gap:6px}
 .oqc-keyRow{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;border:.5px solid var(--dsw-alias-border-l2);background:color-mix(in srgb,var(--dsw-alias-bg-layer-1) 52%,transparent)}
 .oqc-keyName{flex:none;width:96px;font-size:12px;font-weight:500;color:var(--dsw-alias-label-primary)}
@@ -2790,7 +2798,30 @@ ${FONT_FACES}
         'div',
         { className: 'oqc-page' },
         h('h2', { className: 'oqc-pageTitle' }, h(Logo, { size: 22 }), t('pageTitle')),
-        h('p', { className: 'oqc-desc' }, t('pageIntro')),
+        h(
+          'p',
+          { className: 'oqc-desc' },
+          t('pageIntro'),
+          ' ',
+          h(
+            'a',
+            {
+              className: 'oqc-star',
+              href: REPO_URL,
+              target: '_blank',
+              rel: 'noopener noreferrer',
+            },
+            h(
+              'svg',
+              { viewBox: '0 0 16 16', 'aria-hidden': true },
+              h('path', {
+                d: 'M8 1.5l2 4.05 4.47.65-3.24 3.15.77 4.45L8 11.8l-4 2.05.77-4.45L1.53 6.2 6 5.55z',
+                fill: 'currentColor',
+              }),
+            ),
+            t('starCta'),
+          ),
+        ),
 
         loading
           ? h('div', { className: 'oqc-loading' }, h(Spinner), t('loading'))

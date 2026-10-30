@@ -354,6 +354,7 @@ const LIGHT = `
   --dsw-alias-border-l3:rgba(0,0,0,.12);
   --dsw-alias-border-l4:rgba(0,0,0,.16);
   --dsw-alias-brand-primary:#2f6fed;
+  --dsw-alias-link:#4176e6;
 `
 
 /* ---------- 设置页 ---------- */
