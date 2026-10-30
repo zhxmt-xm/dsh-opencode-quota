@@ -80,8 +80,7 @@ if (!source) source = await chooseSource()
 
 const state = installedState()
 if (state === source) {
-  console.log(`当前已经是${stateLabel(state)}，不需要切换。`)
-  process.exit(0)
+  console.log(`当前已经是${stateLabel(state)}，将重新安装。`)
 }
 
 if (process.platform === 'win32') {
@@ -94,6 +93,35 @@ if (process.platform === 'win32') {
     process.exit(1)
   }
 }
+
+/** 用当前平台的 shell 调用 dsh plugin。 */
+function runDsh(args, childEnv = process.env) {
+  if (process.platform === 'win32') {
+    const line = ['dsh', ...args.map((arg) => `"${arg}"`)].join(' ')
+    return spawnSync(process.env.ComSpec || 'cmd.exe', ['/d', '/s', '/c', line], {
+      cwd: repoRoot,
+      env: childEnv,
+      stdio: 'inherit',
+      windowsHide: false,
+    })
+  }
+  return spawnSync('dsh', args, { cwd: repoRoot, env: childEnv, stdio: 'inherit' })
+}
+
+console.log('')
+console.log(`目标：${source === 'github' ? 'GitHub 版' : '本地 link 版'}`)
+
+console.log('[1/3] 卸载当前版本…')
+const removed = runDsh(['plugin', '--profile', profile, 'remove', '@local/dsh-opencode-quota'])
+if (removed.error) {
+  console.warn(`卸载命令失败：${removed.error.message}，继续清理。`)
+} else if (removed.status !== 0) {
+  console.warn(`卸载返回 ${removed.status}，继续清理。`)
+} else {
+  console.log('卸载完成。')
+}
+
+console.log('[2/3] 清理 node_modules 残留…')
 
 /** 旧安装可能是 junction，也可能是 GitHub 装出来的普通目录。 */
 const installed = lstatSync(pkgDir, { throwIfNoEntry: false })
@@ -118,6 +146,7 @@ if (lstatSync(localDir, { throwIfNoEntry: false })) {
 }
 
 /** 中断的插件操作会留下 run.json，清掉避免下次被当成“操作进行中”。 */
+console.log('清理 plugin-manager 运行标记…')
 rmSync(join(profileDir, '.plugin-manager', 'run.json'), { force: true })
 
 const spec =
@@ -132,27 +161,10 @@ if (source === 'github' && proxy) {
   env.ALL_PROXY = proxy
 }
 
-console.log(source === 'github' ? '安装 GitHub 版…' : '安装本地 link 版…')
+console.log(`[3/3] 安装${source === 'github' ? 'GitHub 版' : '本地 link 版'}…`)
 console.log(`dsh plugin --profile ${profile} add ${spec}`)
 
-const args = ['plugin', '--profile', profile, 'add', spec]
-const result =
-  process.platform === 'win32'
-    ? spawnSync(
-        process.env.ComSpec || 'cmd.exe',
-        ['/d', '/s', '/c', `dsh plugin --profile "${profile}" add "${spec}"`],
-        {
-          cwd: repoRoot,
-          env,
-          stdio: 'inherit',
-          windowsHide: false,
-        },
-      )
-    : spawnSync('dsh', args, {
-        cwd: repoRoot,
-        env,
-        stdio: 'inherit',
-      })
+const result = runDsh(['plugin', '--profile', profile, 'add', spec], env)
 
 if (result.error) {
   console.error(`执行 dsh 失败：${result.error.message}`)
