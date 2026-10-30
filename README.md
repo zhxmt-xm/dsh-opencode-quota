@@ -177,16 +177,33 @@ dsh plugin --profile web add github:zhxmt-xm/dsh-opencode-quota
 
 ### 本地开发安装
 
-也可以在 GUI 里安装：左侧栏 → **插件** → **添加插件**，粘贴本仓库绝对路径，安装后点 **立即启用**。
+在仓库根目录运行：
 
 ```powershell
-# Windows PowerShell（把路径换成你的仓库目录）
-dsh plugin --profile desktop add "link:C:\path\to\dsh-opencode-quota"
+npm start
 ```
 
-```sh
-# macOS / Linux
-dsh plugin --profile desktop add "link:$PWD"
+这是本地开发用的安装源切换器，按提示选择：
+
+- **1) 本地 link**：把 desktop profile 指回当前仓库，改完代码重启 DSH 即生效；
+- **2) GitHub**：安装 GitHub 版，用来验证用户实际拿到的发布包。
+
+脚本固定执行“卸载 → 清理 `node_modules` 里的旧 junction/临时目录 → 安装所选来源”。DSH 卸载 `link:` 安装时不会删除 junction，直接切换会 `EPERM`，所以从 link 切到 GitHub 不要只靠 DSH 的卸载按钮。
+
+运行前先完全退出 DSH（Windows 下脚本会检查），并确保 `dsh` 命令在 PATH 上。默认操作 `desktop` profile；需要指定其他 profile 或代理时：
+
+```powershell
+$env:DSH_PROFILE = 'web'
+$env:DSH_PROXY = 'http://127.0.0.1:7890'
+npm start
+```
+
+GitHub 选项需要能访问 github.com；`DSH_PROXY` 不设置时默认使用 `http://127.0.0.1:7890`。
+
+不想用脚本时，也可以手动安装本地 link：
+
+```powershell
+dsh plugin --profile desktop add "link:C:\path\to\dsh-opencode-quota"
 ```
 
 `link:` 直接引用本地目录，改代码后重启宿主即可，不需要重新安装。
