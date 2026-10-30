@@ -1,20 +1,21 @@
 /**
  * OpenCode 额度面板的 Host 半边。
  *
- * 需要区分 DSH 里的两种 opencode 供应商：
- * - `opencode-go`（订阅制 Go / Go Plus）：额度是三个滚动窗口，读 `/inference/go/v1/usage`；
- * - `opencode`（Console 按量计费）：没有订阅额度，只能读 `/console/api/usage/summary` 的花费汇总。
+ * DSH 里的 `opencode-go` / `opencode` 只是两个连接预设，不能拿 provider id 判断
+ * 账户有没有 Go 订阅：同一个组织的任意服务账号 Key 都能读 `/inference/go/v1/usage`，
+ * 额度本身也是组织级共享的。这里用这个接口的 200/404 做订阅探测（404 = 没有订阅），
+ * provider id 只决定优先用哪把 Key、以及没有 Key 时怎么回落。
  *
  * 供应商列表来自 `llm-pi-ai` 设置里的 providers，凭据引用取各自的 `apiKeyEnv`，
- * 缺失时按类型回落到 `OPENCODE_GO_API_KEY` / `OPENCODE_API_KEY`。
+ * 缺失时按预设回落到 `OPENCODE_GO_API_KEY` / `OPENCODE_API_KEY`。
  */
 
-import { mkdir, readFile, rename, writeFile } from 'node:fs/promises'
-import { dirname, join } from 'node:path'
+import { appendFile, mkdir } from 'node:fs/promises'
+import { join } from 'node:path'
 import { homedir } from 'node:os'
 
 /** @typedef {{ percent: number | null, status: 'ok' | 'limited', resetsAt: string | null }} QuotaWindow */
-/** @typedef {{ id: string, kind: 'go' | 'console', ref: string, name: string }} Account */
+/** @typedef {{ id: string, kind: 'go' | 'console', ref: string, name: string }} Account 一个 provider 连接；`kind` 只是连接预设，不代表计费方式。 */
 
 const GO_BASE = 'https://opencode.ai/inference/go/v1'
 const CONSOLE_BASE = 'https://opencode.ai/console/api'
@@ -26,75 +27,7 @@ const TIMEOUT_MS = 12_000
 const MAX_RESPONSE_BYTES = 256 * 1024
 const MAX_BODY_BYTES = 8 * 1024
 const LOOPBACK = new Set(['127.0.0.1', '::1', '::ffff:127.0.0.1'])
-const HISTORY_DAYS = 30
-const SAMPLE_GAP_MS = 4 * 60 * 1000
-
-/**
- * 历史文件路径；DSH_HOME 存在时优先。
- * @returns {string} 绝对路径。
- */
-function historyFile() {
-  const home = process.env.DSH_HOME && process.env.DSH_HOME.length > 0 ? process.env.DSH_HOME : join(homedir(), '.dsh')
-  return join(home, 'opencode-quota', 'history.json')
-}
-
-/**
- * 读历史采样。
- * @returns {Promise<Record<string, Array<any>>>} 按账户 id 分组。
- */
-async function readHistory() {
-  try {
-    const parsed = JSON.parse(await readFile(historyFile(), 'utf8'))
-    return parsed && typeof parsed === 'object' ? parsed : {}
-  } catch {
-    return {}
-  }
-}
-
-/**
- * 写历史采样（临时文件 + rename，避免写一半）。
- * @param {Record<string, Array<any>>} data 全量数据。
- * @returns {Promise<void>} 完成。
- */
-async function writeHistory(data) {
-  const file = historyFile()
-  await mkdir(dirname(file), { recursive: true })
-  const temp = file + '.tmp'
-  await writeFile(temp, JSON.stringify(data))
-  await rename(temp, file)
-}
-
-/**
- * 追加一条额度采样；4 分钟内且数值没变化就不重复记。
- * @param {string} accountId 账户 id。
- * @param {Record<string, QuotaWindow>} quota 三个窗口。
- * @returns {Promise<Array<any>>} 该账户的历史。
- */
-async function recordSample(accountId, quota) {
-  const all = await readHistory()
-  const list = Array.isArray(all[accountId]) ? all[accountId] : []
-  const now = Date.now()
-  const last = list[list.length - 1]
-  const values = {
-    at: now,
-    rolling: quota.rolling ? quota.rolling.percent : null,
-    weekly: quota.weekly ? quota.weekly.percent : null,
-    monthly: quota.monthly ? quota.monthly.percent : null,
-  }
-  const unchanged =
-    last &&
-    last.rolling === values.rolling &&
-    last.weekly === values.weekly &&
-    last.monthly === values.monthly
-  if (!unchanged || !last || now - last.at >= SAMPLE_GAP_MS) {
-    list.push(values)
-  }
-  const cutoff = now - HISTORY_DAYS * 24 * 3600 * 1000
-  const trimmed = list.filter((row) => row && row.at >= cutoff).slice(-5000)
-  all[accountId] = trimmed
-  await writeHistory(all)
-  return trimmed
-}
+const GO_PROBE_MS = 60 * 1000
 
 /** 需要的 Host 服务：HTTP 路由、凭据库、只读设置。 */
 export const inject = ['webServer', 'credentials', 'settings']
@@ -136,6 +69,7 @@ function applyInner(ctx, config) {
         /** provider 名以 opencode 开头（opencode、opencode-go、opencode-work…）或指向 opencode.ai 都算。 */
         const opencode = /^opencode(-|$)/i.test(id) || /opencode\.ai/i.test(baseURL)
         if (!opencode) continue
+        /** kind 只是 DSH 的连接预设（决定优先用哪把 Key），订阅与否由 probeGo 探测。 */
         const kind = id === 'opencode-go' || /\/inference\/go(\/|$)/.test(baseURL) ? 'go' : 'console'
         const ref =
           typeof entry.apiKeyEnv === 'string' && entry.apiKeyEnv.length > 0
@@ -159,6 +93,8 @@ function applyInner(ctx, config) {
   const serviceAccounts = new Map()
   /** 组织成员（owner 的邮箱最适合当 org 名字），按 Key 缓存。 */
   const orgOwners = new Map()
+  /** 账户是否有 Go 订阅；额度是组织级，所以按账户（org id）缓存 60 秒。 */
+  const goProbes = new Map()
 
   /**
    * 读组织成员，挑 owner；同一个 Key 只请求一次。
@@ -217,15 +153,16 @@ function applyInner(ctx, config) {
    * 用 provider 的 Key 读账户身份；读不到时退回 provider 自身，保证不误合并。
    * 账户 = 组织（org）；服务账号只作为 Key 的归属展示。
    * @param {Account} provider provider。
-   * @returns {Promise<{ id: string, name: string, serviceAccount?: string | null }>} 身份。
+   * @returns {Promise<{ id: string, name: string, serviceAccount?: string | null, hasKey?: boolean }>} 身份。
    */
   const resolveIdentity = async (provider) => {
     const cached = identities.get(provider.ref)
     if (cached) return cached
-    let identity = { id: `ref:${provider.ref}`, name: provider.name, serviceAccount: null }
+    let identity = { id: `ref:${provider.ref}`, name: provider.name, serviceAccount: null, hasKey: false }
     try {
       const hit = await ctx.credentials.resolve(provider.ref)
       if (hit && hit.value) {
+        identity.hasKey = true
         /** 服务账号：用 Key 前缀匹配 tokenHint，拿不准也不影响分组。 */
         let serviceAccount = null
         try {
@@ -274,6 +211,7 @@ function applyInner(ctx, config) {
             email: owner ? owner.email : null,
             serviceAccount: serviceAccount ? serviceAccount.name : null,
             serviceAccountId: serviceAccount ? serviceAccount.id : null,
+            hasKey: true,
           }
         }
       }
@@ -292,13 +230,63 @@ function applyInner(ctx, config) {
     const groups = new Map()
     for (const provider of providerEntries()) {
       const identity = await resolveIdentity(provider)
-      const group = groups.get(identity.id) || { id: identity.id, name: identity.name, refs: [] }
+      const group = groups.get(identity.id) || { id: identity.id, name: identity.name, refs: [], hasKey: false }
+      group.hasKey = group.hasKey || Boolean(identity.hasKey)
       if (!group.refs.some((row) => row.ref === provider.ref)) {
         group.refs.push({ kind: provider.kind, ref: provider.ref, name: provider.name })
       }
       groups.set(identity.id, group)
     }
-    return [...groups.values()]
+    const list = [...groups.values()]
+    /** 只配了一个 provider 时，别为没配 Key 的另一个 provider 再画一张空账户。 */
+    const hasIdentified = list.some((group) => !group.id.startsWith('ref:'))
+    return hasIdentified ? list.filter((group) => !group.id.startsWith('ref:') || group.hasKey) : list
+  }
+
+  /**
+   * 用一把 Key 探测账户有没有 Go 订阅。
+   * @param {string} key 明文 Key。
+   * @returns {Promise<boolean | null>} true=有额度，false=404 没订阅，null=这次判断不了。
+   */
+  const probeGoWithKey = async (key) => {
+    try {
+      await fetchQuota(key)
+      return true
+    } catch (error) {
+      if (error && error.code === 'NOT_SUBSCRIBED') return false
+      return null
+    }
+  }
+
+  /**
+   * 探测账户是否有 Go 订阅：优先 Go 预设的 Key，读不到就换下一把。
+   * 订阅是组织级的，所以只按账户探测一次，60 秒内复用。
+   * @param {Account} account 账户。
+   * @returns {Promise<boolean | null>} 探测结果。
+   */
+  const probeGo = async (account) => {
+    const cached = goProbes.get(account.id)
+    if (cached && Date.now() - cached.at < GO_PROBE_MS) return cached.hasGo
+    const candidates = []
+    for (const entry of account.refs) {
+      try {
+        const credential = await ctx.credentials.resolve(entry.ref)
+        if (credential && credential.value) candidates.push({ kind: entry.kind, key: credential.value })
+      } catch {
+        /* 单把 Key 读不到不影响其他 Key */
+      }
+    }
+    candidates.sort((a, b) => (a.kind === 'go' ? 0 : 1) - (b.kind === 'go' ? 0 : 1))
+    let hasGo = null
+    for (const candidate of candidates) {
+      const result = await probeGoWithKey(candidate.key)
+      if (result !== null) {
+        hasGo = result
+        break
+      }
+    }
+    goProbes.set(account.id, { at: Date.now(), hasGo })
+    return hasGo
   }
 
   /**
@@ -322,6 +310,8 @@ function applyInner(ctx, config) {
         serviceAccountId: (identity && identity.serviceAccountId) || null,
       })
     }
+    /** 订阅与否看接口，不看 provider 名；探测不出来时才退回预设。 */
+    const hasGo = await probeGo(account)
     const go = keys.find((row) => row.kind === 'go') || null
     const configured = keys.find((row) => row.configured) || go || keys[0] || null
     /** 组织里出现过的服务账号名，用于给 org 起一个能看懂的名字。 */
@@ -330,7 +320,8 @@ function applyInner(ctx, config) {
       id: account.id,
       name: account.name,
       members,
-      kind: go ? 'go' : 'console',
+      hasGo,
+      kind: hasGo === true ? 'go' : hasGo === false ? 'console' : go ? 'go' : 'console',
       keys,
       keyRef: configured ? configured.ref : null,
       configured: keys.some((row) => row.configured),
@@ -345,8 +336,7 @@ function applyInner(ctx, config) {
    */
   const state = async () => {
     const accounts = await discoverAccounts()
-    const rows = []
-    for (const account of accounts) rows.push(await stateOf(account))
+    const rows = await Promise.all(accounts.map((account) => stateOf(account)))
     return { accounts: rows, baseURL: goBase }
   }
 
@@ -364,11 +354,11 @@ function applyInner(ctx, config) {
    * 读某个账户的额度视图（带 10 秒缓存）。
    * @param {Account} account 账户。
    * @param {boolean} fresh 是否跳过缓存。
-   * @param {'go' | 'console' | 'both'} scope 口径：只有 Go / 只有按量 / 都有。
+   * @param {string} [sa] 服务账号过滤串；空串表示整个 org。
    * @returns {Promise<any>} 视图。
    */
-  const readView = async (account, fresh, scope = 'both', sa = '') => {
-    const cacheKey = `${account.id}:${scope}:${sa}`
+  const readView = async (account, fresh, sa = '') => {
+    const cacheKey = `${account.id}:${sa}`
     const hit = cache.get(cacheKey)
     if (!fresh && hit && Date.now() - hit.at < CACHE_MS) return hit.view
     const keys = []
@@ -381,10 +371,10 @@ function applyInner(ctx, config) {
       error.code = 'NO_KEY'
       throw error
     }
-    /** 按 scope 选 Key：只有按量时优先 console Key，其余优先 go Key。 */
+    /** 额度接口两把 Key 都能读；优先 Go 预设的 Key。 */
     const goKey = keys.find((row) => row.kind === 'go')
     const consoleKey = keys.find((row) => row.kind === 'console')
-    const picked = scope === 'console' ? consoleKey || goKey : goKey || consoleKey
+    const picked = goKey || consoleKey
     const key = picked.value
     /** 选了某个服务账号就按它过滤花费；选 org 时是整个组织。 */
     const filter = sa ? `serviceAccountId=${encodeURIComponent(sa)}` : ''
@@ -398,21 +388,19 @@ function applyInner(ctx, config) {
     }
     const compare = await fetchCompare(key, filter).catch(() => null)
     const models = await fetchModels(key, filter).catch(() => null)
-    /** 只有按量：不读额度窗口，卡片自然按「只有按量」渲染。 */
+    /** 已知没有 Go 订阅时跳过额度请求；手动刷新则重新探测。 */
     let quota = null
-    if (scope !== 'console') {
+    const known = goProbes.get(account.id)
+    if (fresh || !known || known.hasGo !== false) {
       try {
         quota = await fetchQuota(key)
       } catch (error) {
         if (!error || error.code !== 'NOT_SUBSCRIBED') throw error
       }
+      goProbes.set(account.id, { at: Date.now(), hasGo: Boolean(quota) })
     }
     const period = await fetchPeriod(key, quota ? quota.monthly : null, filter).catch(() => null)
-    let history = null
-    if (quota) {
-      history = await recordSample(account.id, quota).catch(() => null)
-    }
-    const view = { scope, kind: quota ? 'go' : 'console', quota, windows: quota, summary, daily, hourly, compare, models, history, period }
+    const view = { kind: quota ? 'go' : 'console', quota, windows: quota, summary, daily, hourly, compare, models, period }
     cache.set(cacheKey, { at: Date.now(), view })
     return view
   }
@@ -420,10 +408,10 @@ function applyInner(ctx, config) {
   /** 客户端激活/报错日志：写到 $DSH_HOME/opencode-quota/client.log，便于排查“没组件”。 */
   const appendClientLog = async (text) => {
     try {
-      const home = process.env.DSH_HOME || path.join(process.env.USERPROFILE || '.', '.dsh')
-      const dir = path.join(home, 'opencode-quota')
-      await fsp.mkdir(dir, { recursive: true })
-      await fsp.appendFile(path.join(dir, 'client.log'), new Date().toISOString() + ' ' + text + '\n')
+      const home = process.env.DSH_HOME || join(homedir(), '.dsh')
+      const dir = join(home, 'opencode-quota')
+      await mkdir(dir, { recursive: true })
+      await appendFile(join(dir, 'client.log'), new Date().toISOString() + ' ' + text + '\n')
     } catch {
       /* 日志失败不影响主流程 */
     }
@@ -477,8 +465,8 @@ function applyInner(ctx, config) {
           if (!method(req, res, 'POST')) return
           try {
             const body = await readJson(req)
-            const accounts = await discoverAccounts()
-            const refs = accounts.flatMap((account) => account.refs.map((row) => row.ref))
+            /** 可写引用来自全部 provider，不能用过滤后的账户列表，否则没配 Key 的 provider 会被漏掉。 */
+            const refs = providerEntries().map((row) => row.ref)
             const ref = typeof body.ref === 'string' && refs.includes(body.ref) ? body.ref : refs[0]
             if (!ref) throw new Error('没有可写的 Key 引用')
             const value = typeof body.key === 'string' ? body.key.trim() : ''
@@ -487,6 +475,8 @@ function applyInner(ctx, config) {
             identities.delete(ref)
             serviceAccounts.clear()
             cache.clear()
+            goProbes.clear()
+            const accounts = await discoverAccounts()
             const account = accounts.find((row) => row.refs.some((entry) => entry.ref === ref)) || accounts[0]
             send(res, 200, await stateOf(account))
           } catch (error) {
@@ -509,9 +499,7 @@ function applyInner(ctx, config) {
           const account = await pickAccount(params.get('account'))
           if (!account) return send(res, 400, { error: { code: 'no-account', message: '没有可用的 opencode 账户' } })
           try {
-            const scopeParam = params.get('scope')
-            const scope = scopeParam === 'go' || scopeParam === 'console' ? scopeParam : 'both'
-            const view = await readView(account, params.get('fresh') === '1', scope, params.get('sa') || '')
+            const view = await readView(account, params.get('fresh') === '1', params.get('sa') || '')
             send(res, 200, { ...(await stateOf(account)), ...view, fetchedAt: Date.now() })
           } catch (error) {
             if (error && error.code === 'NO_KEY') return send(res, 200, { ...(await stateOf(account)), quota: null, summary: null })
@@ -535,10 +523,10 @@ function applyInner(ctx, config) {
   /**
    * 本周与上周的花费对比（周一为界，按本地时区）。
    * @param {string} key 明文 Key。
-   * @param {string} scope 服务账号过滤串（空串表示整个组织）。
+   * @param {string} saFilter 服务账号过滤串（空串表示整个组织）。
    * @returns {Promise<{ current: number, previous: number }>} 两周花费。
    */
-  async function fetchCompare(key, scope) {
+  async function fetchCompare(key, saFilter) {
     const day = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
     const now = new Date()
     const mondayOffset = (now.getDay() + 6) % 7
@@ -546,8 +534,8 @@ function applyInner(ctx, config) {
     const lastMonday = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() - 7)
     const lastSunday = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() - 1)
     const [current, previous] = await Promise.all([
-      fetchSummary(key, `from=${day(monday)}&to=${day(now)}`, scope),
-      fetchSummary(key, `from=${day(lastMonday)}&to=${day(lastSunday)}`, scope),
+      fetchSummary(key, `from=${day(monday)}&to=${day(now)}`, saFilter),
+      fetchSummary(key, `from=${day(lastMonday)}&to=${day(lastSunday)}`, saFilter),
     ])
     return {
       current: current.costUsd,
@@ -566,17 +554,17 @@ function applyInner(ctx, config) {
    * 当前计费周期（从 monthly 重置时间的前一个月到今天）的每日花费。
    * @param {string} key 明文 Key。
    * @param {any} monthly monthly 窗口。
-   * @param {string} scope 服务账号过滤串。
+   * @param {string} saFilter 服务账号过滤串。
    * @returns {Promise<any>} 周期与每日花费。
    */
-  async function fetchPeriod(key, monthly, scope) {
+  async function fetchPeriod(key, monthly, saFilter) {
     if (!monthly || typeof monthly.resetsAt !== 'string') return null
     const end = new Date(monthly.resetsAt)
     const start = new Date(end.getTime())
     start.setMonth(start.getMonth() - 1)
     const day = (date) =>
       `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
-    const filter = scope ? `&${scope}` : ''
+    const filter = saFilter ? `&${saFilter}` : ''
     const body = await requestJson(`${CONSOLE_BASE}/usage/cost-by-day?from=${day(start)}&to=${day(new Date())}${filter}`, key)
     const rows = Array.isArray(body) ? body : []
     return {
@@ -591,9 +579,9 @@ function applyInner(ctx, config) {
     }
   }
 
-  async function fetchDaily(key, range, bucket, scope) {
+  async function fetchDaily(key, range, bucket, saFilter) {
     const withBucket = bucket ? `&bucket=${bucket}` : ''
-    const filter = scope ? `&${scope}` : ''
+    const filter = saFilter ? `&${saFilter}` : ''
     const body = await requestJson(`${CONSOLE_BASE}/usage/cost-by-day?range=${range}${withBucket}${filter}`, key)
     const rows = Array.isArray(body) ? body : []
     return rows.map((row) => ({
@@ -609,8 +597,8 @@ function applyInner(ctx, config) {
    * @param {string} key 明文 Key。
    * @returns {Promise<Array<{ model: string, costUsd: number, requests: number, tokens: number }>>} 模型用量。
    */
-  async function fetchModels(key, scope) {
-    const filter = scope ? `&${scope}` : ''
+  async function fetchModels(key, saFilter) {
+    const filter = saFilter ? `&${saFilter}` : ''
     const body = await requestJson(`${CONSOLE_BASE}/usage/models?pageSize=6${filter}`, key)
     const items = body && Array.isArray(body.items) ? body.items : []
     return items.slice(0, 6).map((row) => ({
@@ -631,11 +619,11 @@ function applyInner(ctx, config) {
    * @param {string} key 明文 Key。
    * @returns {Promise<any>} 汇总（美元金额已换算）。
    */
-  async function fetchSummary(key, query, scope) {
+  async function fetchSummary(key, query, saFilter) {
     /** Console 的「Today」= 本地日界，对应 `since` 参数；不带参数默认是 7 天。 */
     const today = new Date()
     const since = new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString()
-    const filter = scope ? `&${scope}` : ''
+    const filter = saFilter ? `&${saFilter}` : ''
     const search = (query || `since=${encodeURIComponent(since)}`) + filter
     const body = await requestJson(`${CONSOLE_BASE}/usage/summary?${search}`, key)
     const micro = Number(body && body.totalCostMicroCents)
@@ -681,7 +669,7 @@ async function requestJson(url, key) {
   }
   if (raw.length > MAX_RESPONSE_BYTES) throw new Error('上游响应过大')
   if (response.status === 404) {
-    const error = new Error('这个账户没有订阅额度（按量计费）')
+    const error = new Error('这个账户没有 Go 订阅额度')
     error.code = 'NOT_SUBSCRIBED'
     throw error
   }

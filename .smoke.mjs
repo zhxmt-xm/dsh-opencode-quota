@@ -192,6 +192,28 @@ result = await call('/api/opencode-quota/state')
 accounts = result.json.accounts
 check('state: 同账户合并为 1 张卡', accounts.length === 1, accounts)
 check('state: 合并后带两条 key', accounts[0] && accounts[0].keys.length === 2, accounts[0] && accounts[0].keys)
+check('state: 探测到 Go 订阅', accounts[0] && accounts[0].hasGo === true, accounts[0] && accounts[0].hasGo)
+
+// 订阅是组织级的：把 Go 预设的 Key 删掉，只剩 console 预设的 Key 也应能探测到
+await call('/api/opencode-quota/key', {
+  method: 'POST',
+  body: { ref: 'OPENCODE_GO_API_KEY', key: '' },
+  headers: { origin: 'http://127.0.0.1:62088' },
+})
+result = await call('/api/opencode-quota/state')
+accounts = result.json.accounts
+check(
+  'state: 只剩 console 预设 Key 也能探测到 Go',
+  accounts.length === 1 && accounts[0].hasGo === true && accounts[0].keys.length === 1,
+  accounts,
+)
+await call('/api/opencode-quota/key', {
+  method: 'POST',
+  body: { ref: 'OPENCODE_GO_API_KEY', key: 'oc-go' },
+  headers: { origin: 'http://127.0.0.1:62088' },
+})
+result = await call('/api/opencode-quota/state')
+accounts = result.json.accounts
 
 // 合并后的账户同时给窗口与花费
 const mergedId = encodeURIComponent(accounts[0].id)
@@ -209,7 +231,6 @@ check(
   calls.map((c) => c.url).slice(-3),
 )
 check('usage: Go 端点', calls.some((c) => c.url === 'https://opencode.ai/inference/go/v1/usage'), 'missing go endpoint')
-check('history: 采样写入', Array.isArray(result.json.history) && result.json.history.length >= 1, result.json && result.json.history)
 check('usage: 7 天一次取小时桶', calls.some((c) => c.url.includes('range=7d') && c.url.includes('bucket=hour')), calls.map((c) => c.url).filter((url) => url.includes('7d')))
 check('usage: 取到小时序列', result.json && Array.isArray(result.json.hourly) && result.json.hourly.length === 2, result.json && result.json.hourly)
 check('usage: 小时桶可用时不再取日桶', result.json && result.json.daily === null, result.json && result.json.daily)
@@ -219,11 +240,17 @@ check('usage: 模型拆分', result.json && Array.isArray(result.json.models) &&
 const cachedCall = await call(`/api/opencode-quota/usage?account=${mergedId}`)
 check('cache: 10 秒内复用', cachedCall.json && cachedCall.json.quota, 'cache miss')
 
-// Go 404 代表没有订阅：降级为按量，不是错误
+// Go 404 代表没有订阅：降级为 Console 形态，不是错误
 goStatus = 404
 result = await call(`/api/opencode-quota/usage?account=${mergedId}&fresh=1`)
-check('订阅探测: 404 降级为按量', result.status === 200 && result.json.kind === 'console' && result.json.quota === null, result.json)
+check('订阅探测: 404 降级为 Console', result.status === 200 && result.json.kind === 'console' && result.json.quota === null, result.json)
 check('订阅探测: 花费仍可用', result.json && result.json.summary && result.json.summary.requests === 1640, result.json && result.json.summary)
+result = await call('/api/opencode-quota/state')
+check(
+  'state: 404 后 hasGo=false',
+  result.json.accounts[0] && result.json.accounts[0].hasGo === false && result.json.accounts[0].kind === 'console',
+  result.json.accounts[0],
+)
 
 // 7 天小时桶不可用时退回「日桶 + 24 小时桶」
 goStatus = 200
@@ -257,23 +284,21 @@ check(
 )
 
 const orgOther = accounts.find((a) => a.name === 'zhxmt-test')
-let mark = calls.length
-result = await call(`/api/opencode-quota/usage?account=${encodeURIComponent(orgOther.id)}&scope=console&fresh=1`)
-check(
-  'usage: 只有按量时不读额度',
-  !calls.slice(mark).some((c) => c.url.includes('/inference/go/v1/usage')),
-  calls.slice(mark).map((c) => c.url),
-)
-check('usage: 只有按量时 kind=console', result.json && result.json.kind === 'console' && result.json.quota === null, result.json)
+goStatus = 404
+result = await call(`/api/opencode-quota/usage?account=${encodeURIComponent(orgOther.id)}&fresh=1`)
+check('usage: 没有订阅时 kind=console', result.json && result.json.kind === 'console' && result.json.quota === null, result.json)
+check('usage: 没有订阅时仍读花费', result.json && result.json.summary && result.json.summary.requests === 1640, result.json && result.json.summary)
+check('usage: 不再返回 history', result.json && result.json.history === undefined, result.json && result.json.history)
 
-mark = calls.length
-result = await call(`/api/opencode-quota/usage?account=${encodeURIComponent(orgOther.id)}&scope=go&fresh=1`)
+goStatus = 200
+const mark = calls.length
+result = await call(`/api/opencode-quota/usage?account=${encodeURIComponent(orgOther.id)}&fresh=1`)
 check(
-  'usage: 只有 Go 时读额度',
+  'usage: 有订阅时读额度',
   calls.slice(mark).some((c) => c.url.includes('/inference/go/v1/usage')),
   calls.slice(mark).map((c) => c.url),
 )
-check('usage: 只有 Go 时 kind=go', result.json && result.json.kind === 'go' && Boolean(result.json.quota), result.json && result.json.kind)
+check('usage: 有订阅时 kind=go', result.json && result.json.kind === 'go' && Boolean(result.json.quota), result.json && result.json.kind)
 
 // 安全
 result = await call('/api/opencode-quota/key', {

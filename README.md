@@ -39,21 +39,24 @@ dsh plugin --profile desktop add "link:C:\code\dsh-opencode-quota"
 
 ## 账户形态
 
-卡片的五个分块由**数据**决定，不是配置开关：
+卡片的五个分块由**接口数据**决定，不是配置开关，也不看 provider 名：
 
 | 形态 | 触发条件 | 渲染结果 |
 | --- | --- | --- |
-| 只有 Go 订阅 | `GET /inference/go/v1/usage` 返回窗口 | 五块齐全 |
-| 只有按量计费 | 该接口 404（`NOT_SUBSCRIBED`） | 额度、预测整块隐藏；用量没有油表，只留表格 |
-| Go + 按量都有 | 两个 provider 的 Key 属于同一个服务账号 | 合并成一张卡，与「只有 Go」一致 |
+| 只有 Go 订阅 | 任一 Key 调 `GET /inference/go/v1/usage` 返回窗口 | 五块齐全 |
+| 没有 Go 订阅（Console 用量） | 该接口 404（`NOT_SUBSCRIBED`） | 额度、预测整块隐藏；用量没有油表，只留表格 |
+| Go + Console 用量 | 同一个组织既有 Go 订阅、又有 Console 花费 | 合并成一张卡，与「只有 Go」一致 |
 
-五个分块的空态（额度缺百分比、用量为空、预测历史不足、趋势无数据、模型无记录）与对应截图见 [docs/scenarios.png](docs/scenarios.png)。
+DSH 里的 `opencode-go` / `opencode` 只是两个连接预设，不能拿来判断计费方式：同一个组织的任意服务账号 Key 都能读 Go 额度，额度本身也是组织级共享的。插件用 `/inference/go/v1/usage` 的 200/404 做订阅探测，provider id 只决定优先用哪把 Key。
+
+五个分块的空态（额度缺百分比、用量为空、预测数据不足、趋势无数据、模型无记录）与对应截图见 [docs/scenarios.png](docs/scenarios.png)。
 
 ## 数据来源
 
 | 数据 | 接口 | 作用域 |
 | --- | --- | --- |
 | 三个额度窗口 | `GET https://opencode.ai/inference/go/v1/usage` | **组织级**，不支持按服务账号过滤 |
+| 是否 Go 订阅 | 同一个 `GET /inference/go/v1/usage`：200 = 有，404 = 无 | 组织级；任一服务账号 Key 都能探测 |
 | 今日花费与 token | `GET https://opencode.ai/console/api/usage/summary?since=…` | 默认组织，可加 `serviceAccountId=` |
 | 按天/按小时花费 | `GET https://opencode.ai/console/api/usage/cost-by-day?range=…` | 同上 |
 | 按模型花费 | `GET https://opencode.ai/console/api/usage/models` | 同上 |
@@ -67,12 +70,12 @@ Key 来自 DSH 凭据库：优先用 `llm-pi-ai` 里该 provider 的 `apiKeyEnv`
 
 - 所有 Host 路由只接受本机回环请求，并校验 `Origin` / `sec-fetch-site`；
 - Key 只在 Host 进程内使用，不下发到浏览器、不写日志；
-- 历史采样写到 `$DSH_HOME/opencode-quota/history.json`（默认 `~/.dsh`），保留 30 天，只含百分比与时间戳。
+- 额度数据不落盘；界面偏好写在浏览器 `localStorage`，客户端错误日志写到 `$DSH_HOME/opencode-quota/client.log`。
 
 ## 已知限制
 
-- **读不到套餐类型**（Go / Go Plus）：`orgs/*` 接口对服务账号 Key 返回 403，官方也没有公开的订阅查询接口；套餐名靠设置里的「套餐名称」手填。
-- **没有额度历史接口**：额度走势与预测来自插件自己的采样，从首次刷新开始积累。
+- **读不到套餐类型**（Go / Go Plus）：控制台的 `GET /console/api/orgs/current` 里其实有 `hasGoSubscription` / `goSubscription`，但服务账号 Key 调它返回 403，只接受控制台会话；`/api/internal/orgs/:orgId/go/status` 也不对外。插件因此只判断「有没有 Go 订阅」，分不清 Go / Go Plus。
+- **预测只用当前计费周期**：没有额度历史接口，预测来自当前周期的每日花费；周期数据不足两个点时隐藏预测块。
 - **没有按模型按天的数据**：`cost-by-day` 不接受模型维度，模型只有区间总量。
 - 自定义 provider 若指向非 `opencode.ai` 的中转站，不会被识别。
 
