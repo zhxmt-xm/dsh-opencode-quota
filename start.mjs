@@ -16,7 +16,7 @@
  *   DSH_PROXY    GitHub 安装代理，默认 http://127.0.0.1:7890
  */
 
-import { lstatSync, readdirSync, rmSync, rmdirSync } from 'node:fs'
+import { lstatSync, readdirSync, readFileSync, rmSync, rmdirSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { createInterface } from 'node:readline/promises'
@@ -52,6 +52,16 @@ function installedState() {
 
 function stateLabel(state) {
   return state === 'link' ? '本地 link' : state === 'github' ? 'GitHub 版' : '未安装'
+}
+
+/** profile 的 package.json 里是否还声明了这个依赖。 */
+function hasDependency() {
+  try {
+    const pkg = JSON.parse(readFileSync(join(profileDir, 'package.json'), 'utf8'))
+    return Boolean(pkg.dependencies?.['@local/dsh-opencode-quota'])
+  } catch {
+    return false
+  }
 }
 
 /** 没有命令行参数时，用 1/2 选择目标来源。 */
@@ -112,13 +122,17 @@ console.log('')
 console.log(`目标：${source === 'github' ? 'GitHub 版' : '本地 link 版'}`)
 
 console.log('[1/3] 卸载当前版本…')
-const removed = runDsh(['plugin', '--profile', profile, 'remove', '@local/dsh-opencode-quota'])
-if (removed.error) {
-  console.warn(`卸载命令失败：${removed.error.message}，继续清理。`)
-} else if (removed.status !== 0) {
-  console.warn(`卸载返回 ${removed.status}，继续清理。`)
+if (!hasDependency()) {
+  console.log('当前没有已安装的插件，跳过卸载。')
 } else {
-  console.log('卸载完成。')
+  const removed = runDsh(['plugin', '--profile', profile, 'remove', '@local/dsh-opencode-quota'])
+  if (removed.error) {
+    console.warn(`卸载命令失败：${removed.error.message}，继续清理。`)
+  } else if (removed.status !== 0) {
+    console.warn(`卸载返回 ${removed.status}，继续清理。`)
+  } else {
+    console.log('卸载完成。')
+  }
 }
 
 console.log('[2/3] 清理 node_modules 残留…')
