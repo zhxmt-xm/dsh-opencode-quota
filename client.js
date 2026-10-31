@@ -17,7 +17,7 @@ window.__ModuleLoader__.load({
     const API = '/api/opencode-quota'
     const PREFS_KEY = 'opencode-quota:prefs'
     /** 设置页简介后的 GitHub 入口。 */
-    const REPO_URL = 'https://github.com/zhxmt-xm/dsh-opencode-quota'
+    const REPO_URL = 'https://github.com/zhxmt-xm/dsh-opencode-usage-dashboard'
     /** 四段固定区间，颜色直接决定进度条/图表用色；名称留空则用本地化默认名。 */
     const DEFAULT_TIERS = [
       { name: '', from: 0, to: 50, color: '#2ea043' },

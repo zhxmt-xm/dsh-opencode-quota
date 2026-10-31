@@ -1,6 +1,6 @@
 # 开发与原理
 
-`dsh-opencode-quota` 是一个 DeepSeek Harness（DSH）插件：Host 半边读取 OpenCode 的 Go 订阅额度与 Console 用量，浏览器半边把它们画进侧栏卡片和设置页。
+`dsh-opencode-usage-dashboard` 是一个 DeepSeek Harness（DSH）插件：Host 半边读取 OpenCode 的 Go 订阅额度与 Console 用量，浏览器半边把它们画进侧栏卡片和设置页。
 
 产品介绍、截图和安装方式见根目录 [README](../README.md)。本文面向维护者，说明插件怎么工作、数据从哪来、如何本地调试，以及参考图怎么生成。
 
@@ -272,7 +272,7 @@ DSH 里的 `opencode-go` / `opencode` 只是两个连接预设，不能拿来判
 ### 安装到本地 profile
 
 ```powershell
-dsh plugin --profile desktop add "link:C:\path\to\dsh-opencode-quota"
+dsh plugin --profile desktop add "link:C:\path\to\dsh-opencode-usage-dashboard"
 ```
 
 也可以在 GUI 里：左侧栏 → **插件** → **添加插件**，粘贴本仓库绝对路径，安装后点 **立即启用**。
@@ -299,7 +299,7 @@ node .smoke.mjs
 2. 用真实账户验证三种形态（有 Go / 无 Go / Go + Console）；
 3. 重新生成参考图，确认没有意外 UI 变化；
 4. 更新版本号与 README 截图；
-5. 打 tag 后从 GitHub 安装验证一次：`dsh plugin --profile desktop add github:zhxmt-xm/dsh-opencode-quota#<tag>`。
+5. 打 tag 后从 GitHub 安装验证一次：`dsh plugin --profile desktop add github:zhxmt-xm/dsh-opencode-usage-dashboard#<tag>`。
 
 ## 参考图
 

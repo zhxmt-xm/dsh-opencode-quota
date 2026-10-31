@@ -7,11 +7,11 @@
   "author": "zhxmt-xm",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zhxmt-xm/dsh-opencode-quota.git"
+    "url": "git+https://github.com/zhxmt-xm/dsh-opencode-usage-dashboard.git"
   },
-  "homepage": "https://github.com/zhxmt-xm/dsh-opencode-quota#readme",
+  "homepage": "https://github.com/zhxmt-xm/dsh-opencode-usage-dashboard#readme",
   "bugs": {
-    "url": "https://github.com/zhxmt-xm/dsh-opencode-quota/issues"
+    "url": "https://github.com/zhxmt-xm/dsh-opencode-usage-dashboard/issues"
   },
   "keywords": [
     "deepseek-harness",

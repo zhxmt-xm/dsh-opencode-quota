@@ -27,7 +27,7 @@ import { spawnSync } from 'node:child_process'
 
 const PACKAGE_NAME = 'dsh-opencode-usage-dashboard'
 const OLD_PACKAGE_NAME = '@local/dsh-opencode-quota'
-const REPO_SPEC = 'github:zhxmt-xm/dsh-opencode-quota'
+const REPO_SPEC = 'github:zhxmt-xm/dsh-opencode-usage-dashboard'
 const repoRoot = dirname(fileURLToPath(import.meta.url))
 let source = process.argv[2]
 

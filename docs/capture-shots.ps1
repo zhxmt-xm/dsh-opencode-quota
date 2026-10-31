@@ -1,4 +1,4 @@
-﻿# 生成 README 用的单块 / 单面板截图。
+# 生成 README 用的单块 / 单面板截图。
 #
 #   powershell -ExecutionPolicy Bypass -File docs/capture-shots.ps1
 #
@@ -14,7 +14,7 @@ $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 $docs = $PSScriptRoot
 $shots = Join-Path $docs 'shots'
-$tmp = Join-Path ([System.IO.Path]::GetTempPath()) 'dsh-opencode-quota-shots'
+$tmp = Join-Path ([System.IO.Path]::GetTempPath()) 'dsh-opencode-usage-dashboard-shots'
 
 if (-not $Edge) {
   $candidates = @(
