@@ -175,7 +175,11 @@ dsh plugin --profile web add github:zhxmt-xm/dsh-opencode-usage-dashboard
 
 > 安装后**完全退出 DSH 再启动**，Host 半边才会加载。
 
-> npm 包名：`dsh-opencode-usage-dashboard`（发布后可用同名安装）。
+### 从 npm 安装
+
+```sh
+dsh plugin --profile desktop add dsh-opencode-usage-dashboard
+```
 
 ### 本地开发安装
 
