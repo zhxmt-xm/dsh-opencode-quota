@@ -1729,7 +1729,7 @@ ${FONT_FACES}
               { className: 'oqc-spark', viewBox: '0 0 100 100', preserveAspectRatio: 'none', role: 'img' },
               h('path', { d: area, fill: color, opacity: '0.12' }),
               h('path', { d: line, fill: 'none', stroke: color, 'stroke-width': '1.6', 'vector-effect': 'non-scaling-stroke', 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }),
-              h('path', { d: forecastLine, fill: 'none', stroke: '#d9822b', 'stroke-width': '1.4', 'stroke-dasharray': '4 2', 'vector-effect': 'non-scaling-stroke' }),
+              h('path', { d: forecastLine, fill: 'none', stroke: '#d9822b', 'stroke-width': '1.4', 'stroke-dasharray': '1.5 0.8', 'vector-effect': 'non-scaling-stroke' }),
             ),
             points.map((point, index) =>
               h('span', {
