@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/zhxmt-xm/dsh-opencode-usage-dashboard/main/icon.svg" width="88" alt="OpenCode 用量面板 logo">
+  <img src="https://raw.githubusercontent.com/zhxmt-xm/dsh-opencode-usage-dashboard/a701fe3/icon.svg" width="88" alt="OpenCode 用量面板 logo">
 </div>
 
 <h1 align="center">OpenCode 用量面板</h1>
@@ -26,7 +26,7 @@
 > 这是 DeepSeek Harness 的第三方插件，数据来自 OpenCode 官方。
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/zhxmt-xm/dsh-opencode-usage-dashboard/main/docs/screenshot-card.png" alt="侧栏用量卡片：用量、额度、预测、趋势、模型五个分块" width="320">
+  <img src="https://raw.githubusercontent.com/zhxmt-xm/dsh-opencode-usage-dashboard/a701fe3/docs/screenshot-card.png" alt="侧栏用量卡片：用量、额度、预测、趋势、模型五个分块" width="320">
   <br>
   <sub>侧栏卡片（浅色主题，示意数据）：用量 · 额度 · 预测 · 趋势 · 模型</sub>
 </div>
@@ -55,7 +55,7 @@ OpenCode 的额度、花费和用量分散在几个接口里：Go 订阅的滚�
 #### 用量
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/zhxmt-xm/dsh-opencode-usage-dashboard/main/docs/shots/card-today.png" alt="用量分块：本月剩余油表，以及今日、本周、本月的花费与请求数" width="300">
+  <img src="https://raw.githubusercontent.com/zhxmt-xm/dsh-opencode-usage-dashboard/a701fe3/docs/shots/card-today.png" alt="用量分块：本月剩余油表，以及今日、本周、本月的花费与请求数" width="300">
 </p>
 
 - 今日花费、请求数、tokens；
@@ -66,7 +66,7 @@ OpenCode 的额度、花费和用量分散在几个接口里：Go 订阅的滚�
 #### 额度
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/zhxmt-xm/dsh-opencode-usage-dashboard/main/docs/shots/card-quota.png" alt="额度分块：滚动、每周、每月三个窗口与重置倒计时" width="300">
+  <img src="https://raw.githubusercontent.com/zhxmt-xm/dsh-opencode-usage-dashboard/a701fe3/docs/shots/card-quota.png" alt="额度分块：滚动、每周、每月三个窗口与重置倒计时" width="300">
 </p>
 
 - 滚动 5 小时、本周、本月三个窗口；
@@ -76,7 +76,7 @@ OpenCode 的额度、花费和用量分散在几个接口里：Go 订阅的滚�
 #### 预测
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/zhxmt-xm/dsh-opencode-usage-dashboard/main/docs/shots/card-forecast.png" alt="预测分块：实测花费曲线、预测虚线与 50%/100% 预计日期" width="300">
+  <img src="https://raw.githubusercontent.com/zhxmt-xm/dsh-opencode-usage-dashboard/a701fe3/docs/shots/card-forecast.png" alt="预测分块：实测花费曲线、预测虚线与 50%/100% 预计日期" width="300">
 </p>
 
 - 按当前计费周期的花费速度做线性外推；
@@ -86,7 +86,7 @@ OpenCode 的额度、花费和用量分散在几个接口里：Go 订阅的滚�
 #### 趋势
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/zhxmt-xm/dsh-opencode-usage-dashboard/main/docs/shots/card-trend.png" alt="趋势分块：7 天或 24 小时的花费、tokens、请求数柱状图" width="300">
+  <img src="https://raw.githubusercontent.com/zhxmt-xm/dsh-opencode-usage-dashboard/a701fe3/docs/shots/card-trend.png" alt="趋势分块：7 天或 24 小时的花费、tokens、请求数柱状图" width="300">
 </p>
 
 - 7 天 / 24 小时切换；
@@ -96,7 +96,7 @@ OpenCode 的额度、花费和用量分散在几个接口里：Go 订阅的滚�
 #### 模型
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/zhxmt-xm/dsh-opencode-usage-dashboard/main/docs/shots/card-models.png" alt="模型分块：按花费排序的模型条形图" width="300">
+  <img src="https://raw.githubusercontent.com/zhxmt-xm/dsh-opencode-usage-dashboard/a701fe3/docs/shots/card-models.png" alt="模型分块：按花费排序的模型条形图" width="300">
 </p>
 
 - 按花费排序，条形长度按最高花费归一化；
@@ -110,7 +110,7 @@ OpenCode 的额度、花费和用量分散在几个接口里：Go 订阅的滚�
 #### 账户
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/zhxmt-xm/dsh-opencode-usage-dashboard/main/docs/shots/settings-account.png" alt="设置页账户面板：按组织分组的账户、服务账号、刷新间隔" width="640">
+  <img src="https://raw.githubusercontent.com/zhxmt-xm/dsh-opencode-usage-dashboard/a701fe3/docs/shots/settings-account.png" alt="设置页账户面板：按组织分组的账户、服务账号、刷新间隔" width="640">
 </p>
 
 - 账户按组织分组，同一组织的 Key 合成一张卡；
@@ -121,7 +121,7 @@ OpenCode 的额度、花费和用量分散在几个接口里：Go 订阅的滚�
 #### 显示
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/zhxmt-xm/dsh-opencode-usage-dashboard/main/docs/shots/settings-display.png" alt="设置页显示面板：卡片色条开关、色条颜色与四档进度条" width="640">
+  <img src="https://raw.githubusercontent.com/zhxmt-xm/dsh-opencode-usage-dashboard/a701fe3/docs/shots/settings-display.png" alt="设置页显示面板：卡片色条开关、色条颜色与四档进度条" width="640">
 </p>
 
 - 卡片样式：开关控制是否显示左侧色条，旁边选色条颜色；
@@ -131,7 +131,7 @@ OpenCode 的额度、花费和用量分散在几个接口里：Go 订阅的滚�
 #### 卡片展示
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/zhxmt-xm/dsh-opencode-usage-dashboard/main/docs/shots/settings-preview.png" alt="设置页卡片展示面板：五个分块的预览、勾选显示与拖拽排序" width="640">
+  <img src="https://raw.githubusercontent.com/zhxmt-xm/dsh-opencode-usage-dashboard/a701fe3/docs/shots/settings-preview.png" alt="设置页卡片展示面板：五个分块的预览、勾选显示与拖拽排序" width="640">
 </p>
 
 - 直接预览五个分块，勾选框控制侧栏显示 / 隐藏；
