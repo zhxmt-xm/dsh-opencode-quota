@@ -1,10 +1,28 @@
 {
-  "name": "@local/dsh-opencode-quota",
+  "name": "dsh-opencode-usage-dashboard",
   "version": "0.1.0",
-  "private": true,
   "type": "module",
-  "description": "OpenCode Go 套餐额度面板：在左侧栏设置上方显示订阅额度与用量，并在设置里管理账户、展示与刷新。",
+  "description": "OpenCode Go 用量面板：在 DSH 侧栏查看订阅额度、花费与用量趋势。OpenCode Go quota, spend and usage dashboard for DeepSeek Harness.",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zhxmt-xm/dsh-opencode-quota.git"
+  },
+  "homepage": "https://github.com/zhxmt-xm/dsh-opencode-quota#readme",
+  "bugs": {
+    "url": "https://github.com/zhxmt-xm/dsh-opencode-quota/issues"
+  },
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "opencode",
+    "opencode-go",
+    "quota",
+    "usage",
+    "dashboard",
+    "sidebar"
+  ],
   "scripts": {
     "start": "node start.mjs"
   },
@@ -23,7 +41,8 @@
     "icon.svg",
     "README.md",
     "LICENSE",
-    "THIRD_PARTY_NOTICES.md"
+    "THIRD_PARTY_NOTICES.md",
+    "start.mjs"
   ],
   "dsh": {
     "bundle": {

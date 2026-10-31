@@ -8,7 +8,7 @@
  * 浏览器 localStorage，只影响本机显示。
  */
 window.__ModuleLoader__.load({
-  id: '@local/dsh-opencode-quota',
+  id: 'dsh-opencode-usage-dashboard',
   factory(require) {
     const React = require('react')
     const h = React.createElement

@@ -175,6 +175,8 @@ dsh plugin --profile web add github:zhxmt-xm/dsh-opencode-quota
 
 > 安装后**完全退出 DSH 再启动**，Host 半边才会加载。
 
+> npm 包名：`dsh-opencode-usage-dashboard`（发布后可用同名安装）。
+
 ### 本地开发安装
 
 在仓库根目录运行：
@@ -225,7 +227,7 @@ Key 也可以走环境变量回退：`OPENCODE_GO_API_KEY` / `OPENCODE_API_KEY`�
 dsh plugin --profile desktop add github:zhxmt-xm/dsh-opencode-quota
 
 # 卸载
-dsh plugin --profile desktop remove @local/dsh-opencode-quota
+dsh plugin --profile desktop remove dsh-opencode-usage-dashboard
 ```
 
 ## 数据与隐私
