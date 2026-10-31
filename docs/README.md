@@ -277,7 +277,7 @@ dsh plugin --profile desktop add "link:C:\path\to\dsh-opencode-usage-dashboard"
 
 也可以在 GUI 里：左侧栏 → **插件** → **添加插件**，粘贴本仓库绝对路径，安装后点 **立即启用**。
 
-安装后完全退出 DSH 再启动（Host 半边需要重新加载）。改代码后重启宿主即可，`link:` 不需要重新安装。
+安装后按 DSH 的插件重载提示操作；改代码后重载插件（必要时重启 DSH），`link:` 不需要重新安装。
 
 ### 冒烟测试
 

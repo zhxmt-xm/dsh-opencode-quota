@@ -1556,23 +1556,35 @@ ${FONT_FACES}
       let periodStart = resetAt - 30 * 86400000
       let points = []
       if (period && Array.isArray(period.daily) && period.daily.length >= 2) {
-        /** 轴从「本期第一天有用量」开始，避免前几周空白。 */
-        periodStart = Math.max(Date.parse(period.start), Date.parse(period.daily[0].date))
-        const total = period.daily.reduce((sum, row) => sum + row.costUsd, 0)
-        if (total > 0) {
-          let running = 0
-          /** 周期起点锚 0%，每天的点落在当天结束时刻，斜率才是「日均」。 */
-          points = [{ at: periodStart, percent: 0, cost: 0 }]
-          for (const row of period.daily) {
-            running += row.costUsd
-            points.push({
-              at: Math.min(now, Date.parse(row.date) + 86400000),
-              percent: (running / total) * monthly.percent,
-              cost: running,
-            })
-          }
-          if (points[points.length - 1].at < now) {
-            points.push({ at: now, percent: monthly.percent, cost: total })
+        /** 只取落在本期内的日数据，避免周期外的点被压到 x=0。 */
+        const startMs = Number.isFinite(Date.parse(period.start))
+          ? Date.parse(period.start)
+          : resetAt - 30 * 86400000
+        const rows = period.daily
+          .map((row) => ({ ...row, endAt: Date.parse(row.date) + 86400000 }))
+          .filter((row) => Number.isFinite(row.endAt) && row.endAt > startMs && Date.parse(row.date) <= now)
+          .sort((a, b) => a.endAt - b.endAt)
+        if (rows.length > 0) {
+          /** 轴从「本期第一天有用量」开始，避免前几周空白。 */
+          periodStart = Math.max(startMs, Date.parse(rows[0].date))
+          const total = rows.reduce((sum, row) => sum + row.costUsd, 0)
+          if (total > 0) {
+            let running = 0
+            /** 周期起点锚 0%，每天的点落在当天结束时刻，斜率才是「日均」。 */
+            points = [{ at: periodStart, percent: 0, cost: 0 }]
+            for (const row of rows) {
+              const at = Math.min(now, row.endAt)
+              if (at <= points[points.length - 1].at) continue
+              running += row.costUsd
+              points.push({
+                at,
+                percent: (running / total) * monthly.percent,
+                cost: running,
+              })
+            }
+            if (points.length > 1 && points[points.length - 1].at < now) {
+              points.push({ at: now, percent: monthly.percent, cost: total })
+            }
           }
         }
       }
@@ -1717,7 +1729,7 @@ ${FONT_FACES}
               { className: 'oqc-spark', viewBox: '0 0 100 100', preserveAspectRatio: 'none', role: 'img' },
               h('path', { d: area, fill: color, opacity: '0.12' }),
               h('path', { d: line, fill: 'none', stroke: color, 'stroke-width': '1.6', 'vector-effect': 'non-scaling-stroke', 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }),
-              h('path', { d: forecastLine, fill: 'none', stroke: '#d9822b', 'stroke-width': '1.4', 'stroke-dasharray': '3 3', 'vector-effect': 'non-scaling-stroke' }),
+              h('path', { d: forecastLine, fill: 'none', stroke: '#d9822b', 'stroke-width': '1.4', 'stroke-dasharray': '4 2', 'vector-effect': 'non-scaling-stroke' }),
             ),
             points.map((point, index) =>
               h('span', {

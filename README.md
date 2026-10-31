@@ -1,11 +1,11 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/zhxmt-xm/dsh-opencode-usage-dashboard/main/icon.svg" width="88" alt="OpenCode 套餐面板 logo">
+  <img src="https://raw.githubusercontent.com/zhxmt-xm/dsh-opencode-usage-dashboard/main/icon.svg" width="88" alt="OpenCode 用量面板 logo">
 </div>
 
-<h1 align="center">OpenCode 套餐面板</h1>
+<h1 align="center">OpenCode 用量面板</h1>
 
 <p align="center">
-  <b>在 DeepSeek Harness 侧栏，随时看清 OpenCode Go 的额度、花费和趋势。</b>
+  <b>在 DeepSeek Harness 侧栏，随时看清 OpenCode 的额度、花费和趋势。</b>
 </p>
 
 <p align="center">
@@ -26,22 +26,22 @@
 > 这是 DeepSeek Harness 的第三方插件，数据来自 OpenCode 官方。
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/zhxmt-xm/dsh-opencode-usage-dashboard/main/docs/screenshot-card.png" alt="侧栏额度卡片：用量、额度、预测、趋势、模型五个分块" width="320">
+  <img src="https://raw.githubusercontent.com/zhxmt-xm/dsh-opencode-usage-dashboard/main/docs/screenshot-card.png" alt="侧栏用量卡片：用量、额度、预测、趋势、模型五个分块" width="320">
   <br>
   <sub>侧栏卡片（浅色主题，示意数据）：用量 · 额度 · 预测 · 趋势 · 模型</sub>
 </div>
 
 ## 为什么用它
 
-OpenCode Go 的额度分散在几个接口里：滚动窗口、周窗口、月窗口，外加 Console 的花费与 token。这个插件把它们收进一张侧栏卡片，不用打开网页控制台，也不用自己算。
+OpenCode 的额度、花费和用量分散在几个接口里：Go 订阅的滚动 / 周 / 月窗口，Console 的花费与 token。这个插件把它们收进一张侧栏卡片，不用打开网页控制台，也不用自己算。
 
-- **一眼看到最紧的额度**：滚动 5 小时 / 本周 / 本月三个窗口，进度条按四档变色，带重置倒计时。
+- **Go 和按量账户都能用**：有 Go 订阅时显示额度窗口；只有 Console 用量时保留花费、趋势和模型。
 - **知道今天花了多少**：今日花费、请求数、tokens，以及本周 / 本月汇总。
 - **看见趋势**：7 天 / 24 小时，花费 / tokens / 请求数随时切换。
-- **提前知道会不会用完**：按当前计费周期的花费速度外推，标出 50% / 100% 的预计日期。
+- **提前知道会不会用完**：有月度额度时，按当前计费周期的花费速度外推，标出 50% / 100% 的预计日期。
 - **知道钱花在哪个模型**：按花费排序的模型条形图。
 - **多账户不打架**：同一组织的 Key 合并成一张卡，不同组织分开；可切换账户，花费可按服务账号筛选。
-- **侧栏收起也能看**：折叠时退化为一个百分比/金额小方块。
+- **高度可配置**：分块显示/隐藏与排序、色条、四档阈值、趋势指标、刷新间隔都能改。
 - **不打扰**：跟随 DSH 主题、中英双语、无外部 CDN，偏好只存在本机。
 
 ## 界面
@@ -173,8 +173,6 @@ Web 版 profile：
 dsh plugin --profile web add github:zhxmt-xm/dsh-opencode-usage-dashboard
 ```
 
-> 安装后**完全退出 DSH 再启动**，Host 半边才会加载。
-
 ### 从 npm 安装
 
 ```sh
@@ -191,7 +189,7 @@ npm start
 
 这是本地开发用的安装源切换器，按提示选择：
 
-- **1) 本地 link**：把 desktop profile 指回当前仓库，改完代码重启 DSH 即生效；
+- **1) 本地 link**：把 desktop profile 指回当前仓库，改完代码后重载插件（必要时重启 DSH）；
 - **2) GitHub**：安装 GitHub 版，用来验证用户实际拿到的发布包。
 
 脚本固定执行“卸载 → 清理 `node_modules` 里的旧 junction/临时目录 → 安装所选来源”。DSH 卸载 `link:` 安装时不会删除 junction，直接切换会 `EPERM`，所以从 link 切到 GitHub 不要只靠 DSH 的卸载按钮。
@@ -212,7 +210,7 @@ GitHub 选项需要能访问 github.com；`DSH_PROXY` 不设置时默认使用 `
 dsh plugin --profile desktop add "link:C:\path\to\dsh-opencode-usage-dashboard"
 ```
 
-`link:` 直接引用本地目录，改代码后重启宿主即可，不需要重新安装。
+`link:` 直接引用本地目录，改代码后重载插件（必要时重启 DSH），不需要重新安装。
 
 ### 配置 Key
 
@@ -227,8 +225,11 @@ Key 也可以走环境变量回退：`OPENCODE_GO_API_KEY` / `OPENCODE_API_KEY`�
 ### 更新 / 卸载
 
 ```sh
-# 更新：重新执行 add；如果没拉到新提交，先 remove 再 add
+# GitHub 安装的更新：重新执行 add；没拉到新提交就先 remove 再 add
 dsh plugin --profile desktop add github:zhxmt-xm/dsh-opencode-usage-dashboard
+
+# npm 安装的更新（Market 里也可以直接点更新）
+dsh plugin --profile desktop add dsh-opencode-usage-dashboard
 
 # 卸载
 dsh plugin --profile desktop remove dsh-opencode-usage-dashboard

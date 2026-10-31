@@ -1,4 +1,4 @@
-# 生成 README 用的单块 / 单面板截图。
+﻿# 生成 README 用的单块 / 单面板截图。
 #
 #   powershell -ExecutionPolicy Bypass -File docs/capture-shots.ps1
 #
