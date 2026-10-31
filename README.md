@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="icon.svg" width="88" alt="OpenCode 套餐面板 logo">
+  <img src="https://raw.githubusercontent.com/zhxmt-xm/dsh-opencode-quota/main/icon.svg" width="88" alt="OpenCode 套餐面板 logo">
 </div>
 
 <h1 align="center">OpenCode 套餐面板</h1>
@@ -19,14 +19,14 @@
   <a href="#安装">安装</a> ·
   <a href="#界面">界面</a> ·
   <a href="#账户形态">账户形态</a> ·
-  <a href="docs/README.md">开发与原理</a>
+  <a href="https://github.com/zhxmt-xm/dsh-opencode-quota/blob/main/docs/README.md">开发与原理</a>
 </p>
 
 > [!NOTE]
 > 这是 DeepSeek Harness 的第三方插件，数据来自 OpenCode 官方。
 
 <div align="center">
-  <img src="docs/screenshot-card.png" alt="侧栏额度卡片：用量、额度、预测、趋势、模型五个分块" width="320">
+  <img src="https://raw.githubusercontent.com/zhxmt-xm/dsh-opencode-quota/main/docs/screenshot-card.png" alt="侧栏额度卡片：用量、额度、预测、趋势、模型五个分块" width="320">
   <br>
   <sub>侧栏卡片（浅色主题，示意数据）：用量 · 额度 · 预测 · 趋势 · 模型</sub>
 </div>
@@ -55,7 +55,7 @@ OpenCode Go 的额度分散在几个接口里：滚动窗口、周窗口、月�
 #### 用量
 
 <p align="center">
-  <img src="docs/shots/card-today.png" alt="用量分块：本月剩余油表，以及今日、本周、本月的花费与请求数" width="300">
+  <img src="https://raw.githubusercontent.com/zhxmt-xm/dsh-opencode-quota/main/docs/shots/card-today.png" alt="用量分块：本月剩余油表，以及今日、本周、本月的花费与请求数" width="300">
 </p>
 
 - 今日花费、请求数、tokens；
@@ -66,7 +66,7 @@ OpenCode Go 的额度分散在几个接口里：滚动窗口、周窗口、月�
 #### 额度
 
 <p align="center">
-  <img src="docs/shots/card-quota.png" alt="额度分块：滚动、每周、每月三个窗口与重置倒计时" width="300">
+  <img src="https://raw.githubusercontent.com/zhxmt-xm/dsh-opencode-quota/main/docs/shots/card-quota.png" alt="额度分块：滚动、每周、每月三个窗口与重置倒计时" width="300">
 </p>
 
 - 滚动 5 小时、本周、本月三个窗口；
@@ -76,7 +76,7 @@ OpenCode Go 的额度分散在几个接口里：滚动窗口、周窗口、月�
 #### 预测
 
 <p align="center">
-  <img src="docs/shots/card-forecast.png" alt="预测分块：实测花费曲线、预测虚线与 50%/100% 预计日期" width="300">
+  <img src="https://raw.githubusercontent.com/zhxmt-xm/dsh-opencode-quota/main/docs/shots/card-forecast.png" alt="预测分块：实测花费曲线、预测虚线与 50%/100% 预计日期" width="300">
 </p>
 
 - 按当前计费周期的花费速度做线性外推；
@@ -86,7 +86,7 @@ OpenCode Go 的额度分散在几个接口里：滚动窗口、周窗口、月�
 #### 趋势
 
 <p align="center">
-  <img src="docs/shots/card-trend.png" alt="趋势分块：7 天或 24 小时的花费、tokens、请求数柱状图" width="300">
+  <img src="https://raw.githubusercontent.com/zhxmt-xm/dsh-opencode-quota/main/docs/shots/card-trend.png" alt="趋势分块：7 天或 24 小时的花费、tokens、请求数柱状图" width="300">
 </p>
 
 - 7 天 / 24 小时切换；
@@ -96,7 +96,7 @@ OpenCode Go 的额度分散在几个接口里：滚动窗口、周窗口、月�
 #### 模型
 
 <p align="center">
-  <img src="docs/shots/card-models.png" alt="模型分块：按花费排序的模型条形图" width="300">
+  <img src="https://raw.githubusercontent.com/zhxmt-xm/dsh-opencode-quota/main/docs/shots/card-models.png" alt="模型分块：按花费排序的模型条形图" width="300">
 </p>
 
 - 按花费排序，条形长度按最高花费归一化；
@@ -110,7 +110,7 @@ OpenCode Go 的额度分散在几个接口里：滚动窗口、周窗口、月�
 #### 账户
 
 <p align="center">
-  <img src="docs/shots/settings-account.png" alt="设置页账户面板：按组织分组的账户、服务账号、刷新间隔" width="640">
+  <img src="https://raw.githubusercontent.com/zhxmt-xm/dsh-opencode-quota/main/docs/shots/settings-account.png" alt="设置页账户面板：按组织分组的账户、服务账号、刷新间隔" width="640">
 </p>
 
 - 账户按组织分组，同一组织的 Key 合成一张卡；
@@ -121,7 +121,7 @@ OpenCode Go 的额度分散在几个接口里：滚动窗口、周窗口、月�
 #### 显示
 
 <p align="center">
-  <img src="docs/shots/settings-display.png" alt="设置页显示面板：卡片色条开关、色条颜色与四档进度条" width="640">
+  <img src="https://raw.githubusercontent.com/zhxmt-xm/dsh-opencode-quota/main/docs/shots/settings-display.png" alt="设置页显示面板：卡片色条开关、色条颜色与四档进度条" width="640">
 </p>
 
 - 卡片样式：开关控制是否显示左侧色条，旁边选色条颜色；
@@ -131,7 +131,7 @@ OpenCode Go 的额度分散在几个接口里：滚动窗口、周窗口、月�
 #### 卡片展示
 
 <p align="center">
-  <img src="docs/shots/settings-preview.png" alt="设置页卡片展示面板：五个分块的预览、勾选显示与拖拽排序" width="640">
+  <img src="https://raw.githubusercontent.com/zhxmt-xm/dsh-opencode-quota/main/docs/shots/settings-preview.png" alt="设置页卡片展示面板：五个分块的预览、勾选显示与拖拽排序" width="640">
 </p>
 
 - 直接预览五个分块，勾选框控制侧栏显示 / 隐藏；
@@ -151,7 +151,7 @@ OpenCode Go 的额度分散在几个接口里：滚动窗口、周窗口、月�
 | 只有 Console 按量 | 额度与预测隐藏，保留用量、趋势、模型 |
 | Go + Console | 合并成一张卡，与「只有 Go」一致 |
 
-插件用 `GET /inference/go/v1/usage` 的 200/404 判断有没有 Go 订阅，provider id 只决定优先用哪把 Key。完整规则见 [开发与原理 → 账户形态](docs/README.md#账户形态)。
+插件用 `GET /inference/go/v1/usage` 的 200/404 判断有没有 Go 订阅，provider id 只决定优先用哪把 Key。完整规则见 [开发与原理 → 账户形态](https://github.com/zhxmt-xm/dsh-opencode-quota/blob/main/docs/README.md#账户形态)。
 
 ## 安装
 
@@ -237,12 +237,12 @@ dsh plugin --profile desktop remove dsh-opencode-usage-dashboard
 - 所有 Host 路由只接受本机回环请求，并校验 `Origin` / `sec-fetch-site`；
 - 上游请求 12 秒超时、拒绝重定向、响应体上限 256 KB。
 
-架构、接口、已知限制、调试与发布检查见 [docs/README.md](docs/README.md)。
+架构、接口、已知限制、调试与发布检查见 [docs/README.md](https://github.com/zhxmt-xm/dsh-opencode-quota/blob/main/docs/README.md)。
 
 ## 许可
 
-- 插件代码：MIT，见 [LICENSE](LICENSE)；
-- 内嵌 Noto Sans SC 字体：SIL OFL 1.1，见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
+- 插件代码：MIT，见 [LICENSE](https://github.com/zhxmt-xm/dsh-opencode-quota/blob/main/LICENSE)；
+- 内嵌 Noto Sans SC 字体：SIL OFL 1.1，见 [THIRD_PARTY_NOTICES.md](https://github.com/zhxmt-xm/dsh-opencode-quota/blob/main/THIRD_PARTY_NOTICES.md)。
 
 ---
 
