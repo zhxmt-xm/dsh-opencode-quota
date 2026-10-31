@@ -77,7 +77,7 @@ const t = (key, vars) => {
 const DAY = 86400000
 const HOUR = 3600000
 /** 固定「现在」，参考图每次渲染都一致；改这个值会让倒计时、相对时间、趋势日期和预测一起平移。 */
-const now = Date.parse('2026-10-29T07:40:00Z')
+const now = Date.parse('2026-11-01T08:26:49Z')
 /** 让倒计时、趋势日期和「x 分钟前」都停在同一时刻，截图才可重复。 */
 const RealDate = Date
 class FixedDate extends RealDate {
@@ -90,8 +90,8 @@ class FixedDate extends RealDate {
 }
 globalThis.Date = FixedDate
 const iso = (at) => new Date(at).toISOString()
-const resetAt = Date.parse('2026-11-27T08:26:49Z')
-const startAt = Date.parse('2026-10-27T08:26:49Z')
+const resetAt = Date.parse('2026-11-26T22:50:00Z')
+const startAt = Date.parse('2026-10-28T03:30:00Z')
 const pad = (n) => String(n).padStart(2, '0')
 const dayKey = (ms) => {
   const d = new Date(ms)
@@ -101,13 +101,13 @@ const dayKey = (ms) => {
 const QUOTA_WINDOWS = {
   rolling: { percent: 34, status: 'ok', resetsAt: iso(now + 2.6 * HOUR) },
   weekly: { percent: 21, status: 'ok', resetsAt: iso(now + 4.2 * DAY) },
-  monthly: { percent: 8, status: 'ok', resetsAt: iso(resetAt) },
+  monthly: { percent: 23, status: 'ok', resetsAt: iso(resetAt) },
 }
-const dailyRows = Array.from({ length: 7 }, (_, index) => {
-  const at = now - (6 - index) * DAY
+const dailyRows = Array.from({ length: 5 }, (_, index) => {
+  const at = now - (4 - index) * DAY
   return {
     date: dayKey(at),
-    costUsd: [0.42, 0.61, 0.28, 0.93, 0.55, 0.77, 0.34][index],
+    costUsd: [0.82, 1.15, 0.74, 1.48, 0.55][index],
     tokens: 1_200_000 + index * 180_000,
     requests: 42 + index * 9,
   }
@@ -149,10 +149,10 @@ const VIEW_BASE = {
   keys: [{ kind: 'go', ref: 'R1', configured: true, source: 'file' }],
   baseURL: 'https://opencode.ai/inference/go/v1',
   quota: QUOTA_WINDOWS,
-  summary: summaryOf(dailyRows),
+  summary: summaryOf(dailyRows.slice(-1)),
   daily: dailyRows,
   hourly: hourlyRows,
-  compare: { current: 3.9, previous: 2.9, requests: 640, tokens: 6_800_000 },
+  compare: { current: 3.9, previous: 2.9, requests: 190, tokens: 4_600_000 },
   period: periodOf(dailyRows),
   history: Array.from({ length: 40 }, (_, index) => ({ at: now - (39 - index) * HOUR, monthly: 6.4 + index * 0.04 })),
   models,
@@ -180,7 +180,7 @@ const VIEW_FORECAST_SPARSE = { ...VIEW_BASE, period: null, history: [] }
 const VIEW_TREND_EMPTY = { ...VIEW_BASE, daily: [], hourly: [] }
 
 /* ---------- 序列化 ---------- */
-const SVG_CAMEL = new Set(['viewBox'])
+const SVG_CAMEL = new Set(['viewBox', 'preserveAspectRatio'])
 const escapeHtml = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 const styleText = (style) =>
   Object.entries(style)
